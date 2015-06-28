@@ -488,5 +488,107 @@ void IRCServer::checkLogin(int fd, const char * user, const char * password, con
 	}
 }
 
+int encryptMessage(int fd, char * request) {
+    int p = 0;
+    int q = 0;
+    char * message;
+    
+    char * command = (char *) malloc(1000 * sizeof(char));
+	char * str_p = (char *) malloc(1000 * sizeof(char));
+	char * str_q = (char *) malloc(1000 * sizeof(char));
+	char * str_m = (char *) malloc(1000 * sizeof(char));
+
+	int spaces[10];
+	n = 0;
+	int i = 0;
+	
+	for (i = 0; i < 10; i++) {
+		spaces[i] = -10;
+	}
+	
+	char * commandLine = request;
+
+	for (i = 0; commandLine[i] != '\0'; i++) {
+		if (commandLine[i] == ' ')
+			spaces[n++] = i;
+	}
+	char * p = commandLine;
+
+	int j = 0;
+	for (i = 0, j = 0; i < spaces[0]; i++, p++) {
+		command[j++] = *p;
+	}
+	command[j] = '\0';
+
+	p++;
+
+	for (i = spaces[0] + 1, j = 0; i < spaces[1]; i++, p++) {
+		str_p[j++] = *p;
+	}
+	str_p[j] = '\0';
+
+	p++;
+
+	for (i = spaces[1] + 1, j = 0; (spaces[2] > 0) ? (i < spaces[2]):(commandLine[i] != '\0'); i++, p++) {
+		str_q[j++] = *p;
+	}
+	str_q[j] = '\0';
+
+	p++;
+
+	for (i = spaces[2] + 1, j = 0; i >= 0 && commandLine[i] != '\0'; i++, p++) {
+		str_m[j++] = *p;
+	}
+	str_m[j] = '\0';
+	
+	int p_len = strlen(str_p);
+    int p = 0;
+    int i = 0;
+    while (i <= p_len - 1) {
+          p += pow(10, i) * (str_p[i]);
+          i++;
+    }
+    
+    int q_len = strlen(str_q);
+    int q = 0;
+    i = 0;
+    while (i <= q_len - 1) {
+          q += pow(10, i) * (str_q[i]);
+          i++;
+    }
+    
+    if (p < 11 || isPrime(p) != 0) {
+          write(fd, "Incorrect Input for p", 22);
+    }
+    
+    else if (q < 11 || q == p || isPrime(q) != 0) {
+          write(fd, "Incorrect Input for q", 22);
+    }
+    
+    // Check other parameters.  
+    
+    
+    // Encrypt message. Input for p and q is perfect
+    else {
+              
+    }
+         
+}
+
+int isPrime(int num) {
+    int i = 11;
+    int rem = 0;
+    while (i <= num/2) {
+          rem = 0;
+          temp = 0;
+          temp = num/i;
+          rem = num - (temp * i);
+          if (rem == 0) {
+              return -1;
+          }
+    }
+    
+    return 0;
+}
 	
 
