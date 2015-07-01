@@ -225,10 +225,6 @@ void IRCServer::processRequest (int fd) {
 			spaces[n++] = i;
 	}
 
-	/*if (strcmp(commandLine, copy) != 0) {
-		commandLine = strcpy(commandLine, copy);
-	}*/
-
 	char * p = commandLine;
 
 	int j = 0;
@@ -260,7 +256,7 @@ void IRCServer::processRequest (int fd) {
 	
 	printf("command=%s\n", command);
 	printf("user=%s\n", user);
-	printf( "password=%s\n", password );
+	printf("password=%s\n", password );
 	printf("args=%s\n", args);
 
 	if (!strcmp(command, "ADD-USER")) {
@@ -292,18 +288,17 @@ void IRCServer::processRequest (int fd) {
 
 void IRCServer::initialize() {
 	// Open password file
-	fpass = fopen("password.txt", "w+");  	
+	fpass = fopen("password.txt", "r+");  	
 
 	// Initialize users in room
-	rlist->head = NULL;
+	//rlist->head = NULL;
 	
 	// Initalize message list
 
 }
 
 bool IRCServer::checkPassword(int fd, const char * user, const char * password) {
-	// Here check the password
-	
+	// Here check the password	
 	char * s = (char *) malloc(1000 * sizeof(char));
 	char * p;
 	char * prev = (char *) malloc (1000 * sizeof(char));
