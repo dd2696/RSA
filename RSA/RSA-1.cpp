@@ -413,65 +413,6 @@ void IRCServer::addUser(int fd, const char * user, const char * password, const 
 	return;		
 }
 
-void IRCServer::enterRoom(int fd, const char * user, const char * password, const char * args) {
-	if (checkPassword(fd, user, password) == false) {
-		write(fd, "ERROR (Wrong password)\r\n", 24);
-		return;
-	}
-	
-	else {
-		
-		User * u = (User *) malloc(sizeof(User));
-		
-		u->name = strdup(user);
-		u->password = strdup(password);
-		
-		char * roomName = strdup(args); 
-		Room * e = rlist->head;
-		
-		int flag = 0;
-		while(e != NULL) {
-			if (strcmp(e->value, roomName) == 0) {
-				flag = 1;
-				User * m = (User *) malloc(sizeof(User));
-				m = e->members->head;
-				User * mprev = (User *) malloc(sizeof(User));
-				
-				User * check = e->members->head;				
-				while (check != NULL) {
-					if (strcmp(check->name, u->name) == 0) {
-						flag = -1;
-						write(fd, "OK\r\n", 4);
-						return;
-					}
-					check = check->next;
-				}
-				if (flag != -1) {
-					if (m == NULL) {
-		    				e->members->head = u;
-	    					u->next = NULL;
-					}		   	  
-					else {
-	    					mprev = e->members->head;
-						e->members->head = u;
-			    			u->next = mprev;
-         				}
-	
-					break;
-				}
-			}
-			e = e->next;
-		}
-
-		if (flag == 0) {
-			write(fd, "ERROR (No room)\r\n", 17);
-			return;
-		}
-		write(fd, "OK\r\n", 4);
-	}
-	return;
-}
-
 void IRCServer::checkLogin(int fd, const char * user, const char * password, const char * args) {
 	if (checkPassword(fd, user, password) == true) { 
 		write(fd, "Good", 4);
@@ -493,7 +434,6 @@ int encryptMessage(int fd, const char * user, const char * password, const char 
         int q = 0;
         char * message;
     
-        char * command = (char *) malloc(1000 * sizeof(char));
         char * str_p = (char *) malloc(1000 * sizeof(char));
 	    char * str_q = (char *) malloc(1000 * sizeof(char));
      	char * str_m = (char *) malloc(1000 * sizeof(char));
@@ -506,7 +446,7 @@ int encryptMessage(int fd, const char * user, const char * password, const char 
     		spaces[i] = -10;
     	}
     	
-    	char * commandLine = request;
+    	char * commandLine = args;
     
     	for (i = 0; commandLine[i] != '\0'; i++) {
     		if (commandLine[i] == ' ')
@@ -515,25 +455,17 @@ int encryptMessage(int fd, const char * user, const char * password, const char 
     	char * p = commandLine;
     
     	int j = 0;
-    	for (i = 0, j = 0; i < spaces[0]; i++, p++) {
-    		command[j++] = *p;
-    	}
-    	command[j] = '\0';
-    
-    	p++;
-    
+    	    
     	for (i = spaces[0] + 1, j = 0; i < spaces[1]; i++, p++) {
     		str_p[j++] = *p;
     	}
     	str_p[j] = '\0';
-    
     	p++;
     
     	for (i = spaces[1] + 1, j = 0; (spaces[2] > 0) ? (i < spaces[2]):(commandLine[i] != '\0'); i++, p++) {
     		str_q[j++] = *p;
     	}
     	str_q[j] = '\0';
-    
     	p++;
     
     	for (i = spaces[2] + 1, j = 0; i >= 0 && commandLine[i] != '\0'; i++, p++) {
@@ -570,7 +502,7 @@ int encryptMessage(int fd, const char * user, const char * password, const char 
         
         // Encrypt message. Input for p and q is perfect
         else {
-                  
+              int n = p * q;     
         }
      } 
 }
