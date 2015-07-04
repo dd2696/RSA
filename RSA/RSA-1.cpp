@@ -510,9 +510,13 @@ int encryptMessage(int fd, const char * user, const char * password, const char 
               write(fd, "Incorrect Input for q", 22);
         }
         
+        int phi = (p - 1) * (q - 1);
+        
+        else if (gcdCalculator(e, phi) != 1) {
+              write(fd, "Incorrect Input for e", 22);
+        }  
         // Check other parameters.  
-        
-        
+ 
         // Encrypt message. Input for p and q is perfect
         else {
               int n = p * q;   
@@ -533,8 +537,16 @@ int isPrime(int num) {
               return -1;
           }
     }
-    
     return 0;
+}
+
+int gcdCalculator (int x, int y) {
+    
+    int mul = 1;
+    int rem = 0;
+    do {
+        rem = x - mul * y; 
+    } while (rem >= y) 
 }
 	
 
