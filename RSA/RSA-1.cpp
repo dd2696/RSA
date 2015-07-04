@@ -430,10 +430,6 @@ int encryptMessage(int fd, const char * user, const char * password, const char 
 		return;
     }
     else { 
-        int p = 0;
-        int q = 0;
-        char * message;
-    
         char * str_p = (char *) malloc(1000 * sizeof(char));
 	    char * str_q = (char *) malloc(1000 * sizeof(char));
      	char * str_m = (char *) malloc(1000 * sizeof(char));
@@ -456,19 +452,28 @@ int encryptMessage(int fd, const char * user, const char * password, const char 
     
     	int j = 0;
     	    
-    	for (i = spaces[0] + 1, j = 0; i < spaces[1]; i++, p++) {
+    	// First input is value of p
+        for (i = spaces[0] + 1, j = 0; i < spaces[1]; i++, p++) {
     		str_p[j++] = *p;
     	}
     	str_p[j] = '\0';
     	p++;
     
+        // Next os value of q    
     	for (i = spaces[1] + 1, j = 0; (spaces[2] > 0) ? (i < spaces[2]):(commandLine[i] != '\0'); i++, p++) {
     		str_q[j++] = *p;
     	}
     	str_q[j] = '\0';
     	p++;
     
+        // Third is value of e
     	for (i = spaces[2] + 1, j = 0; i >= 0 && commandLine[i] != '\0'; i++, p++) {
+    		str_e[j++] = *p;
+    	}
+    	str_e[j] = '\0';
+    	
+    	// Rest is message
+    	for (i = spaces[3] + 1, j = 0; i >= 0 && commandLine[i] != '\0'; i++, p++) {
     		str_m[j++] = *p;
     	}
     	str_m[j] = '\0';
@@ -477,7 +482,7 @@ int encryptMessage(int fd, const char * user, const char * password, const char 
         int p = 0;
         int i = 0;
         while (i <= p_len - 1) {
-              p += pow(10, i) * (str_p[i]);
+              p += pow(10, i) * (str_p[i] - 48);
               i++;
         }
         
@@ -485,7 +490,15 @@ int encryptMessage(int fd, const char * user, const char * password, const char 
         int q = 0;
         i = 0;
         while (i <= q_len - 1) {
-              q += pow(10, i) * (str_q[i]);
+              q += pow(10, i) * (str_q[i] - 48);
+              i++;
+        }
+        
+        int e_len = strlen(str_e);
+        int e = 0;
+        i = 0;
+        while (i <= e_len - 1) {
+              e += pow(10, i) * (str_e[i] - 48);
               i++;
         }
         
@@ -502,7 +515,8 @@ int encryptMessage(int fd, const char * user, const char * password, const char 
         
         // Encrypt message. Input for p and q is perfect
         else {
-              int n = p * q;     
+              int n = p * q;   
+                
         }
      } 
 }
