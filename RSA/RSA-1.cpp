@@ -541,12 +541,22 @@ int isPrime(int num) {
 }
 
 int gcdCalculator (int x, int y) {
-    
-    int mul = 1;
-    int rem = 0;
-    do {
-        rem = x - mul * y; 
-    } while (rem >= y) 
+    int i = 2;
+    int gcd = 1;
+    while (i <= x/2 && i <= y/2) {
+        if (isPrime(i) == 0) {
+           if ((x % i == 0) && (y % i == 0)) {
+                  gcd *= i;
+           }
+           else {
+                i++;
+           }
+        }
+        else {
+             i++;
+        }
+    }
+    return gcd; 
 }
 	
 
