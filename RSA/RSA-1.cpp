@@ -30,7 +30,7 @@ const char * usage =
 #include <stdio.h>
 #include <time.h>
 
-#include "IRCServer.h"
+#include "RSA.h"
 
 int QueueLength = 5;
 
@@ -80,7 +80,7 @@ typedef struct User User;
 
 FILE * fpass;
 
-int IRCServer::open_server_socket(int port) {
+int RSAServer::open_server_socket(int port) {
 
 	// Set the IP address and port for this server
 	struct sockaddr_in serverIPAddress; 
@@ -122,7 +122,7 @@ int IRCServer::open_server_socket(int port) {
 	return masterSocket;
 }
 
-void IRCServer::runServer (int port) {
+void RSAServer::runServer (int port) {
 	int masterSocket = open_server_socket(port);
 
 	initialize();
@@ -156,13 +156,13 @@ int main(int argc, char ** argv) {
 	// Get the port from the arguments
 	int port = atoi(argv[1]);
 
-	IRCServer ircServer;
+	RSAServer RSAServer;
 
 	// It will never return
-	ircServer.runServer(port);
+	RSAServer.runServer(port);
 }
 
-void IRCServer::processRequest (int fd) {
+void RSAServer::processRequest (int fd) {
 	// Buffer used to store the comand received from the client
 	const int MaxCommandLine = 1024;
 	char commandLine[MaxCommandLine + 1];
@@ -262,15 +262,6 @@ void IRCServer::processRequest (int fd) {
 	if (!strcmp(command, "ADD-USER")) {
 		addUser(fd, user, password, args);
 	}
-	else if (!strcmp (command, "CREATE-ROOM")) {
-		createRoom(fd, user, password, args);
-	}
-	else if (!strcmp(command, "ENTER-ROOM")) {
-		enterRoom(fd, user, password, args);
-	}
-	else if (!strcmp(command, "LEAVE-ROOM")) {
-		leaveRoom(fd, user, password, args);
-	}
 	else if (strcmp(command, "CHECK-LOGIN") == 0) { 
 		checkLogin(fd, user, password, args);
 	}
@@ -286,7 +277,7 @@ void IRCServer::processRequest (int fd) {
 	close(fd);	
 }
 
-void IRCServer::initialize() {
+void RSAServer::initialize() {
 	// Open password file
 	fpass = fopen("password.txt", "r+");  	
 
@@ -297,7 +288,7 @@ void IRCServer::initialize() {
 
 }
 
-bool IRCServer::checkPassword(int fd, const char * user, const char * password) {
+bool RSAServer::checkPassword(int fd, const char * user, const char * password) {
 	// Here check the password	
 	char * s = (char *) malloc(1000 * sizeof(char));
 	char * p;
@@ -357,7 +348,7 @@ bool IRCServer::checkPassword(int fd, const char * user, const char * password) 
 	return false;
 }
 
-void IRCServer::addUser(int fd, const char * user, const char * password, const char * args) {
+void RSAServer::addUser(int fd, const char * user, const char * password, const char * args) {
 	// Here add a new user. For now always return OK.
 	
 	User * u = (User *) malloc(sizeof(User *));
@@ -413,7 +404,7 @@ void IRCServer::addUser(int fd, const char * user, const char * password, const 
 	return;		
 }
 
-void IRCServer::checkLogin(int fd, const char * user, const char * password, const char * args) {
+void RSAServer::checkLogin(int fd, const char * user, const char * password, const char * args) {
 	if (checkPassword(fd, user, password) == true) { 
 		write(fd, "Good", 4);
 		return;
@@ -424,63 +415,65 @@ void IRCServer::checkLogin(int fd, const char * user, const char * password, con
 	}
 }
 
-int encryptMessage(int fd, const char * user, const char * password, const char * args) {
+int RSAServer::encryptMessage(int fd, const char * user, const char * password, const char * args) {
     if (checkPassword(fd, user, password) == false) {
-        write(fd, "ERROR (Wrong password)\r\n", 24);
-		return;
+         write(fd, "ERROR (Wrong password)\r\n", 24);
+		 return -1;
     }
     else { 
         char * str_p = (char *) malloc(1000 * sizeof(char));
 	    char * str_q = (char *) malloc(1000 * sizeof(char));
      	char * str_m = (char *) malloc(1000 * sizeof(char));
+     	char * str_e = (char *) malloc(1000 * sizeof(char));
 
       	int spaces[10];
-	    n = 0;
+	    int n = 0;
         int i = 0;
 	
     	for (i = 0; i < 10; i++) {
     		spaces[i] = -10;
     	}
     	
-    	char * commandLine = args;
+    	char * commandLine = strcpy(commandLine, args);
     
     	for (i = 0; commandLine[i] != '\0'; i++) {
     		if (commandLine[i] == ' ')
     			spaces[n++] = i;
     	}
-    	char * p = commandLine;
+    	char * a = commandLine;
     
     	int j = 0;
     	    
     	// First input is value of p
         for (i = spaces[0] + 1, j = 0; i < spaces[1]; i++, p++) {
-    		str_p[j++] = *p;
+    		str_p[j++] = *a;
     	}
     	str_p[j] = '\0';
-    	p++;
+    	a++;
     
         // Next os value of q    
     	for (i = spaces[1] + 1, j = 0; (spaces[2] > 0) ? (i < spaces[2]):(commandLine[i] != '\0'); i++, p++) {
-    		str_q[j++] = *p;
+    		str_q[j++] = *a;
     	}
     	str_q[j] = '\0';
-    	p++;
+    	a++;
     
         // Third is value of e
     	for (i = spaces[2] + 1, j = 0; i >= 0 && commandLine[i] != '\0'; i++, p++) {
-    		str_e[j++] = *p;
+    		str_e[j++] = *a;
     	}
     	str_e[j] = '\0';
+    	a++;
     	
     	// Rest is message
     	for (i = spaces[3] + 1, j = 0; i >= 0 && commandLine[i] != '\0'; i++, p++) {
-    		str_m[j++] = *p;
+    		str_m[j++] = *a;
     	}
     	str_m[j] = '\0';
     	
     	int p_len = strlen(str_p);
         int p = 0;
-        int i = 0;
+        i = 0;
         while (i <= p_len - 1) {
               p += pow(10, i) * (str_p[i] - 48);
               i++;
@@ -512,7 +505,7 @@ int encryptMessage(int fd, const char * user, const char * password, const char 
         
         int phi = (p - 1) * (q - 1);
         
-        else if (gcdCalculator(e, phi) != 1) {
+        else if (gcdCalculator(e, phi) != 1 || e <= 1 || e >= phi) {
               write(fd, "Incorrect Input for e", 22);
         }  
         // Check other parameters.  
@@ -557,6 +550,17 @@ int gcdCalculator (int x, int y) {
         }
     }
     return gcd; 
+}
+
+int modInverse (int e, int phi) {
+    int d = 1;
+    int rem = 0; 
+    do {
+        int quotient = b/phi;
+        int c = quotient * phi;
+        rem = (d * e) - c;
+    } while (rem != 1);
+    return d;
 }
 	
 

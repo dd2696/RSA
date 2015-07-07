@@ -1,9 +1,10 @@
-#ifndef IRC_SERVER
-#define IRC_SERVER
+#ifndef RSA_SERVER
+#define RSA_SERVER
+using namespace std;
 
 #define PASSWORD_FILE "password.txt"
 
-class IRCServer {
+class RSAServer {
 	// Add any variables you need
 
 private:
@@ -13,15 +14,8 @@ public:
 	void initialize();
 	bool checkPassword(int fd, const char * user, const char * password);
 	void processRequest( int socket );
+	int encryptMessage(int fd, const char * user, const char * password, const char * args);
 	void addUser(int fd, const char * user, const char * password, const char * args);
-	void createRoom (int fd, const char * user, const char * password, const char * args);
-	void enterRoom(int fd, const char * user, const char * password, const char * args);
-	void leaveRoom(int fd, const char * user, const char * password, const char * args);
-	void sendMessage(int fd, const char * user, const char * password, const char * args);
-	void getMessages(int fd, const char * user, const char * password, const char * args);
-	void getUsersInRoom(int fd, const char * user, const char * password, const char * args);
-	void getAllUsers(int fd, const char * user, const char * password, const char * args);
-	void listRooms(int fd, const char * user, const char * password);
 	void checkLogin(int fd, const char * user, const char * password, const char * args);
 	void runServer(int port);
 };
