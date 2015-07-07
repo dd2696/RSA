@@ -29,6 +29,7 @@ const char * usage =
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
+#include <math.h>
 
 #include "RSA.h"
 
@@ -445,28 +446,28 @@ int RSAServer::encryptMessage(int fd, const char * user, const char * password, 
     	int j = 0;
     	    
     	// First input is value of p
-        for (i = spaces[0] + 1, j = 0; i < spaces[1]; i++, p++) {
+        for (i = spaces[0] + 1, j = 0; i < spaces[1]; i++, a++) {
     		str_p[j++] = *a;
     	}
     	str_p[j] = '\0';
     	a++;
     
         // Next os value of q    
-    	for (i = spaces[1] + 1, j = 0; (spaces[2] > 0) ? (i < spaces[2]):(commandLine[i] != '\0'); i++, p++) {
+    	for (i = spaces[1] + 1, j = 0; (spaces[2] > 0) ? (i < spaces[2]):(commandLine[i] != '\0'); i++, a++) {
     		str_q[j++] = *a;
     	}
     	str_q[j] = '\0';
     	a++;
     
         // Third is value of e
-    	for (i = spaces[2] + 1, j = 0; i >= 0 && commandLine[i] != '\0'; i++, p++) {
+    	for (i = spaces[2] + 1, j = 0; i >= 0 && commandLine[i] != '\0'; i++, a++) {
     		str_e[j++] = *a;
     	}
     	str_e[j] = '\0';
     	a++;
     	
     	// Rest is message
-    	for (i = spaces[3] + 1, j = 0; i >= 0 && commandLine[i] != '\0'; i++, p++) {
+    	for (i = spaces[3] + 1, j = 0; i >= 0 && commandLine[i] != '\0'; i++, a++) {
     		str_m[j++] = *a;
     	}
     	str_m[j] = '\0';
@@ -495,6 +496,8 @@ int RSAServer::encryptMessage(int fd, const char * user, const char * password, 
               i++;
         }
         
+        int phi = (p - 1) * (q - 1);
+        
         if (p < 11 || p > 1000 || isPrime(p) != 0) {
               write(fd, "Incorrect Input for p", 22);
         }
@@ -502,9 +505,7 @@ int RSAServer::encryptMessage(int fd, const char * user, const char * password, 
         else if (q < 11 || q == p || q > 1000 || isPrime(q) != 0) {
               write(fd, "Incorrect Input for q", 22);
         }
-        
-        int phi = (p - 1) * (q - 1);
-        
+                
         else if (gcdCalculator(e, phi) != 1 || e <= 1 || e >= phi) {
               write(fd, "Incorrect Input for e", 22);
         }  
@@ -518,12 +519,12 @@ int RSAServer::encryptMessage(int fd, const char * user, const char * password, 
      } 
 }
 
-int isPrime(int num) {
+int RSAServer::isPrime(int num) {
     int i = 11;
     int rem = 0;
     while (i <= num/2) {
           rem = 0;
-          temp = 0;
+          int temp = 0;
           temp = num/i;
           rem = num - (temp * i);
           if (rem == 0) {
@@ -533,7 +534,7 @@ int isPrime(int num) {
     return 0;
 }
 
-int gcdCalculator (int x, int y) {
+int RSAServer::gcdCalculator (int x, int y) {
     int i = 2;
     int gcd = 1;
     while (i <= x/2 && i <= y/2) {
@@ -552,11 +553,11 @@ int gcdCalculator (int x, int y) {
     return gcd; 
 }
 
-int modInverse (int e, int phi) {
+int RSAServer::modInverse (int e, int phi) {
     int d = 1;
     int rem = 0; 
     do {
-        int quotient = b/phi;
+        int quotient = (d * e)/phi;
         int c = quotient * phi;
         rem = (d * e) - c;
     } while (rem != 1);

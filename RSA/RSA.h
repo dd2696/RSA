@@ -14,6 +14,9 @@ public:
 	void initialize();
 	bool checkPassword(int fd, const char * user, const char * password);
 	void processRequest( int socket );
+	int isPrime(int num);
+	int gcdCalculator (int x, int y);
+	int modInverse (int e, int phi);
 	int encryptMessage(int fd, const char * user, const char * password, const char * args);
 	void addUser(int fd, const char * user, const char * password, const char * args);
 	void checkLogin(int fd, const char * user, const char * password, const char * args);
