@@ -509,12 +509,15 @@ int RSAServer::encryptMessage(int fd, const char * user, const char * password, 
         else if (gcdCalculator(e, phi) != 1 || e <= 1 || e >= phi) {
               write(fd, "Incorrect Input for e", 22);
         }  
-        // Check other parameters.  
- 
+        
+        else if (strcmp(str_m, "") == 0) {
+             write (fd, "Error: Incorrect input for message");
+        }
         // Encrypt message. Input for p and q is perfect
         else {
               int n = p * q;   
-                
+              int array_size = (str_m/2) + 1;   
+              int encrypted_array[4][20];
         }
      } 
 }
