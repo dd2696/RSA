@@ -520,6 +520,7 @@ int RSAServer::encryptMessage(int fd, const char * user, const char * password, 
               int encrypted_array[2][20];
               int pos_r = 0;
               int pos_c = 0;
+              int d = modInverse(e, phi);
               
               for (int k = 0; k < strlen(str_m); k++) {
                   pos_r = 0;
@@ -531,7 +532,7 @@ int RSAServer::encryptMessage(int fd, const char * user, const char * password, 
                   }
                   
                   int ascii = (int) str_m[k];
-                  int cipher_value = generateCipherValue(ascii);
+                  int cipher_value = generateCipherValue(ascii, e);
                   encryted_array[pos_r][pos_c] = cipher_value;
               }
         }
