@@ -518,6 +518,17 @@ int RSAServer::encryptMessage(int fd, const char * user, const char * password, 
               int n = p * q;   
               int array_size = (str_m/2) + 1;   
               int encrypted_array[4][20];
+              int pos_r = 0;
+              int pos_c = 0;
+              
+              for (int k = 0; k < strlen(str_m); k++) {
+                  if (k % 4 == 0) {
+                     pos_c++;
+                  }
+                  if (k % 2 == 0) {
+                  //Write at first two slots in array after encryption   
+                  }
+              }
         }
      } 
 }
