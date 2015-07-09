@@ -16,6 +16,7 @@ public:
 	void processRequest( int socket );
 	int isPrime(int num);
 	int gcdCalculator (int x, int y);
+	int encryptCipherValue (int ascii);
 	int modInverse (int e, int phi);
 	int encryptMessage(int fd, const char * user, const char * password, const char * args);
 	void addUser(int fd, const char * user, const char * password, const char * args);

@@ -517,20 +517,29 @@ int RSAServer::encryptMessage(int fd, const char * user, const char * password, 
         else {
               int n = p * q;   
               int array_size = (str_m/2) + 1;   
-              int encrypted_array[4][20];
+              int encrypted_array[2][20];
               int pos_r = 0;
               int pos_c = 0;
               
               for (int k = 0; k < strlen(str_m); k++) {
+                  pos_r = 0;
                   if (k % 4 == 0) {
                      pos_c++;
                   }
-                  if (k % 2 == 0) {
-                  //Write at first two slots in array after encryption   
+                  if (k % 2 == 1) {
+                     pos_r = 1; 
                   }
+                  
+                  int ascii = (int) str_m[k];
+                  int cipher_value = generateCipherValue(ascii);
+                  encryted_array[pos_r][pos_c] = cipher_value;
               }
         }
      } 
+}
+
+int RSAServer::generateCipherValue(int ascii) {
+        
 }
 
 int RSAServer::isPrime(int num) {
