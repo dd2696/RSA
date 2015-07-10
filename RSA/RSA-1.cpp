@@ -532,15 +532,21 @@ int RSAServer::encryptMessage(int fd, const char * user, const char * password, 
                   }
                   
                   int ascii = (int) str_m[k];
-                  int cipher_value = generateCipherValue(ascii, e);
+                  int cipher_value = generateCipherValue(ascii, e, n);
                   encryted_array[pos_r][pos_c] = cipher_value;
               }
         }
      } 
 }
 
-int RSAServer::generateCipherValue(int ascii) {
-        
+int RSAServer::generateCipherValue(int m, int e, int n) {
+    int c = 1;
+    int temp = 1;
+    for (int i = 1; i <= e; i++) {
+         temp = m * c;
+         c = temp - ((temp/n) * n);
+    }   
+    return c;
 }
 
 int RSAServer::isPrime(int num) {
