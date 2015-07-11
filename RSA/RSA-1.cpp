@@ -266,14 +266,13 @@ void RSAServer::processRequest (int fd) {
 	else if (strcmp(command, "CHECK-LOGIN") == 0) { 
 		checkLogin(fd, user, password, args);
 	}
+	else if (strcmp(command, "ENCRYPT-MESSAGE" == 0) {
+        encryptMessage(fd, user, password, args);
+    } 
 	else {
 		const char * msg =  "UNKNOWN COMMAND\r\n";
 		write(fd, msg, strlen(msg));
 	}
-
-	// Send OK answer
-	//const char * msg =  "OK\n";
-	//write(fd, msg, strlen(msg));
 
 	close(fd);	
 }
@@ -416,7 +415,7 @@ void RSAServer::checkLogin(int fd, const char * user, const char * password, con
 	}
 }
 
-int RSAServer::encryptMessage(int fd, const char * user, const char * password, const char * args) {
+void RSAServer::encryptMessage(int fd, const char * user, const char * password, const char * args) {
     if (checkPassword(fd, user, password) == false) {
          write(fd, "ERROR (Wrong password)\r\n", 24);
 		 return -1;
@@ -536,7 +535,10 @@ int RSAServer::encryptMessage(int fd, const char * user, const char * password, 
                   encryted_array[pos_r][pos_c] = cipher_value;
               }
         }
-     } 
+     }
+     
+     // Write the encrypted message into string
+      
 }
 
 int RSAServer::generateCipherValue(int m, int e, int n) {
@@ -593,5 +595,53 @@ int RSAServer::modInverse (int e, int phi) {
     } while (rem != 1);
     return d;
 }
+
+void RSAServer::decryptMessage (int fd, const char * user, const char * password, const char * args) {
+    if (checkPassword(fd, user, password) == false) {
+        write(fd, "ERROR (Wrong password)\r\n", 24);
+	    return -1;
+    }  
+    else {
+        char * str_d = (char *) malloc(1000 * sizeof(char));
+	    char * str_n = (char *) malloc(1000 * sizeof(char));
+        char * str_m = (char *) malloc(1000 * sizeof(char));
+        
+       	int spaces[10];
+	    int n = 0;
+        int i = 0;
 	
+    	for (i = 0; i < 10; i++) {
+    		spaces[i] = -10;
+    	}
+    	
+    	char * commandLine = strcpy(commandLine, args);
+    
+    	for (i = 0; commandLine[i] != '\0'; i++) {
+    		if (commandLine[i] == ' ')
+    			spaces[n++] = i;
+    	}
+    	char * a = commandLine;
+    
+    	int j = 0;
+    	    
+    	// First input is value of d
+        for (i = spaces[0] + 1, j = 0; i < spaces[1]; i++, a++) {
+    		str_d[j++] = *a;
+    	}
+    	str_d[j] = '\0';
+    	a++;
+    
+        // Next os value of n    
+    	for (i = spaces[1] + 1, j = 0; (spaces[2] > 0) ? (i < spaces[2]):(commandLine[i] != '\0'); i++, a++) {
+    		str_n[j++] = *a;
+    	}
+    	str_n[j] = '\0';
+    	a++;
+    
+        // Third is value of m
+    	for (i = spaces[2] + 1, j = 0; i >= 0 && commandLine[i] != '\0'; i++, a++) {
+    		str_m[j++] = *a;
+    	}
+    	str_m[j] = '\0';    
+}
 
