@@ -17,8 +17,10 @@ public:
 	int isPrime(int num);
 	int gcdCalculator (int x, int y);
 	int generateCipherValue (int m, int e, int n);
+	char decryptCipherValue (int val, int d, int n);
 	int modInverse (int e, int phi);
-	int encryptMessage(int fd, const char * user, const char * password, const char * args);
+	void encryptMessage(int fd, const char * user, const char * password, const char * args);
+	void decryptMessage(int fd, const char * user, const char * password, const char * args);
 	void addUser(int fd, const char * user, const char * password, const char * args);
 	void checkLogin(int fd, const char * user, const char * password, const char * args);
 	void runServer(int port);

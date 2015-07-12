@@ -459,7 +459,7 @@ void RSAServer::encryptMessage(int fd, const char * user, const char * password,
     	a++;
     
         // Third is value of e
-    	for (i = spaces[2] + 1, j = 0; i >= 0 && commandLine[i] != '\0'; i++, a++) {
+    	for (i = spaces[2] + 1, j = 0; (spaces[3] > 0) ? (i < spaces[3]):(commandLine[i] != '\0'); i++, a++) {
     		str_e[j++] = *a;
     	}
     	str_e[j] = '\0';
@@ -499,24 +499,28 @@ void RSAServer::encryptMessage(int fd, const char * user, const char * password,
         
         if (p < 11 || p > 1000 || isPrime(p) != 0) {
               write(fd, "Incorrect Input for p", 22);
+              return;
         }
         
         else if (q < 11 || q == p || q > 1000 || isPrime(q) != 0) {
               write(fd, "Incorrect Input for q", 22);
+              return;
         }
                 
         else if (gcdCalculator(e, phi) != 1 || e <= 1 || e >= phi) {
               write(fd, "Incorrect Input for e", 22);
+              return;
         }  
         
         else if (strcmp(str_m, "") == 0) {
-             write (fd, "Error: Incorrect input for message");
+             write (fd, "Error: Incorrect input for message", 34);
+             return;
         }
         // Encrypt message. Input for p and q is perfect
         else {
               int n = p * q;   
               int array_size = (str_m/2) + 1;   
-              int encrypted_array[2][20];
+              int encrypted_array[2][array_size];
               int pos_r = 0;
               int pos_c = 0;
               int d = modInverse(e, phi);
@@ -643,5 +647,54 @@ void RSAServer::decryptMessage (int fd, const char * user, const char * password
     		str_m[j++] = *a;
     	}
     	str_m[j] = '\0';    
+    	
+    	int d_len = strlen(str_d);
+        int d = 0;
+        i = 0;
+        while (i <= d_len - 1) {
+              d += pow(10, i) * (str_d[i] - 48);
+              i++;
+        }
+        
+        int n_len = strlen(str_n);
+        int n = 0;
+        i = 0;
+        while (i <= p_len - 1) {
+              p += pow(10, i) * (str_p[i] - 48);
+              i++;
+        }
+        
+        if (d <= 0 || n <= 1) {
+              write(fd, "Incorrect Input for d/n", 24);
+              return;
+        }
+        
+        else if (strcmp(str_m, "") == 0) {
+             write(fd, "Incorrect input for message", 27);
+             return;
+        }
+        
+        else {  
+             char temp;
+             int m_len = strlen(str_m)/2;
+             char * message = (char *) malloc (m_len * sizeof(char));
+             int ctr = 0;
+             
+             for (int k = 0; k < strlen(str_m); k+=2) {
+                 int val1 = str_m[k] - 48;
+                 int val2 = str_m[k + 1] - 48;
+                 
+                 if (val1 == 0) {
+                      temp = generateDecryptValue(val2, d, n);
+                 }
+                 else {
+                      int val = val1 * 10 + val2;
+                      temp = generateDecryptValue(val, d, n);
+                 }
+                 *message[ctr] = temp;
+                 ctr++;          
+             }      
+        }
+    }
 }
 
