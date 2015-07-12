@@ -685,16 +685,26 @@ void RSAServer::decryptMessage (int fd, const char * user, const char * password
                  int val2 = str_m[k + 1] - 48;
                  
                  if (val1 == 0) {
-                      temp = generateDecryptValue(val2, d, n);
+                      temp = decryptCipherValue(val2, d, n);
                  }
                  else {
                       int val = val1 * 10 + val2;
-                      temp = generateDecryptValue(val, d, n);
+                      temp = decryptCipherValue(val, d, n);
                  }
                  *message[ctr] = temp;
                  ctr++;          
              }      
+             
+             //Return final string
+             write(fd, message, strlen(message));
         }
     }
 }
+
+char RSAServer::decryptCipherValue(int val, int d, int n) {
+     int temp = pow(val, d);
+     int rem = temp - ((temp/n) * n);
+     return rem;
+}
+
 
