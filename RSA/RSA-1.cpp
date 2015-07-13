@@ -266,9 +266,12 @@ void RSAServer::processRequest (int fd) {
 	else if (strcmp(command, "CHECK-LOGIN") == 0) { 
 		checkLogin(fd, user, password, args);
 	}
-	else if (strcmp(command, "ENCRYPT-MESSAGE" == 0) {
+	else if (strcmp(command, "ENCRYPT-MESSAGE") == 0) {
         encryptMessage(fd, user, password, args);
     } 
+    else if (strcmp(command, "DECRYPT-MESSAGE") == 0) {
+        decryptMessage(fd, user, password, args);
+    }
 	else {
 		const char * msg =  "UNKNOWN COMMAND\r\n";
 		write(fd, msg, strlen(msg));
@@ -280,12 +283,6 @@ void RSAServer::processRequest (int fd) {
 void RSAServer::initialize() {
 	// Open password file
 	fpass = fopen("password.txt", "r+");  	
-
-	// Initialize users in room
-	//rlist->head = NULL;
-	
-	// Initalize message list
-
 }
 
 bool RSAServer::checkPassword(int fd, const char * user, const char * password) {
@@ -418,7 +415,7 @@ void RSAServer::checkLogin(int fd, const char * user, const char * password, con
 void RSAServer::encryptMessage(int fd, const char * user, const char * password, const char * args) {
     if (checkPassword(fd, user, password) == false) {
          write(fd, "ERROR (Wrong password)\r\n", 24);
-		 return -1;
+		 return;
     }
     else { 
         char * str_p = (char *) malloc(1000 * sizeof(char));
@@ -519,30 +516,28 @@ void RSAServer::encryptMessage(int fd, const char * user, const char * password,
         // Encrypt message. Input for p and q is perfect
         else {
               int n = p * q;   
-              int array_size = (str_m/2) + 1;   
-              int encrypted_array[2][array_size];
-              int pos_r = 0;
-              int pos_c = 0;
+              char * enc_string = (char *) malloc(strlen(str_m) * 2 * sizeof(char));
+              int ctr_string = 0;
               int d = modInverse(e, phi);
               
-              for (int k = 0; k < strlen(str_m); k++) {
-                  pos_r = 0;
-                  if (k % 4 == 0) {
-                     pos_c++;
-                  }
-                  if (k % 2 == 1) {
-                     pos_r = 1; 
-                  }
-                  
+              for (int k = 0; k < strlen(str_m); k++) {               
                   int ascii = (int) str_m[k];
                   int cipher_value = generateCipherValue(ascii, e, n);
-                  encryted_array[pos_r][pos_c] = cipher_value;
+                  if (cipher_value < 10) {
+                     enc_string[ctr_string] = '0';
+                     enc_string[ctr_string + 1] = (char) (48 + cipher_value);
+                     ctr_string += 2;
+                  }
+                  else {
+                     enc_string[ctr_string] = (char) (48 + (cipher_value/10));
+                     enc_string[ctr_string + 1] = (char) (48 + (cipher_value%10));  
+                     ctr_string += 2;
+                  }
               }
+              // Write the encrypted message into string
+              write (fd, enc_string, strlen(enc_string));  
         }
-     }
-     
-     // Write the encrypted message into string
-      
+     }    
 }
 
 int RSAServer::generateCipherValue(int m, int e, int n) {
@@ -603,7 +598,7 @@ int RSAServer::modInverse (int e, int phi) {
 void RSAServer::decryptMessage (int fd, const char * user, const char * password, const char * args) {
     if (checkPassword(fd, user, password) == false) {
         write(fd, "ERROR (Wrong password)\r\n", 24);
-	    return -1;
+	    return;
     }  
     else {
         char * str_d = (char *) malloc(1000 * sizeof(char));
@@ -657,10 +652,10 @@ void RSAServer::decryptMessage (int fd, const char * user, const char * password
         }
         
         int n_len = strlen(str_n);
-        int n = 0;
+        n = 0;
         i = 0;
-        while (i <= p_len - 1) {
-              p += pow(10, i) * (str_p[i] - 48);
+        while (i <= n_len - 1) {
+              n += pow(10, i) * (str_n[i] - 48);
               i++;
         }
         
@@ -691,7 +686,7 @@ void RSAServer::decryptMessage (int fd, const char * user, const char * password
                       int val = val1 * 10 + val2;
                       temp = decryptCipherValue(val, d, n);
                  }
-                 *message[ctr] = temp;
+                 message[ctr] = (char) temp;
                  ctr++;          
              }      
              
