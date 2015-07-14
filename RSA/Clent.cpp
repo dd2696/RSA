@@ -29,24 +29,16 @@ int messageCount = 0;
 #define MAX_MESSAGE_LEN 300
 #define MAX_RESPONSE (20 * 1024)
  
-GtkWidget * window;
-GtkWidget * window2;
+GtkWidget * window1;
 GtkWidget * dialog;
-GtkWidget * roomInfo;
-GtkWidget * sview;
-GtkWidget * mview;
-GtkListStore * list_rooms;
-GtkListStore * user_list;
 
 const char * user_text;
 const char * pass_text;
 const char * room_text;
-gchar * room;
-
 
 int open_client_socket(char * host, int port) {
        // Initialize socket address structure
-       struct  sockaddr_in socketAddress;
+       struct sockaddr_in socketAddress;
 
        // Clear sockaddr structure
        memset((char *)&socketAddress,0,sizeof(socketAddress));
@@ -111,9 +103,9 @@ int sendCommand (char * host, int port, char * command, char * user, char * pass
  	       len += n;
         }
 
-	int rlen = strlen(response);
-	response[rlen] = '\0';
-	printf("response:%s\n", response);
+	    int rlen = strlen(response);
+	    response[rlen] = '\0';
+	    printf("response:%s\n", response);
         close(sock);
 }
 
@@ -398,142 +390,11 @@ static void logout_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
 }
    
 int main (int argc, char *argv[]) {
-    GtkWidget * table;
-	GtkWidget * button;
-	GtkWidget * label;
-	GtkWidget * entry;
-
-     	gtk_init (&argc, &argv);
-	          
-      	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);    	
-	gtk_window_set_title(GTK_WINDOW(window), "Login to Client");
-
-	g_signal_connect (window, "delete-event", G_CALLBACK (delete_event), NULL);
-	g_signal_connect (window, "destroy", G_CALLBACK (destroy), NULL);
-	
-	gtk_container_set_border_width (GTK_CONTAINER (window), 10);
-
-	table = gtk_table_new(4, 3, TRUE);
-	gtk_container_add (GTK_CONTAINER(window), table);
-
-	label = gtk_label_new("Username");
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 0, 1);
-	gtk_widget_show(label);
-
-	label = gtk_label_new("Password");
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 1, 2);
-	gtk_widget_show(label);
-
-	entry = gtk_entry_new();
-	g_signal_connect (entry, "activate", G_CALLBACK (enter_callback_user), entry);
-	gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 4, 0, 1);
-	gtk_widget_show (entry);
-	
-	entry = gtk_entry_new();
-	gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
-	g_signal_connect (entry, "activate", G_CALLBACK (enter_callback_pass), entry);
-	gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 4, 1, 2);
-	gtk_widget_show (entry);
-
-	button = gtk_button_new_with_label ("LOGIN");
-	g_signal_connect (button, "clicked", G_CALLBACK (login_event), (gpointer) "Login Button");
-	gtk_table_attach_defaults(GTK_TABLE(table), button, 1, 2, 3, 4);
-	gtk_widget_show (button);
-	
-	button = gtk_button_new_with_label ("ADD NEW USER");
-	g_signal_connect (button, "clicked", G_CALLBACK (add_event), (gpointer) "Add Button");
-	gtk_table_attach_defaults(GTK_TABLE(table), button, 2, 3, 3, 4);
-	gtk_widget_show (button);
-
-	gtk_widget_show(table);
-	gtk_widget_show(window);
-
-	//*****************WINDOW 2*************************
-	
-	window2 = gtk_window_new(GTK_WINDOW_TOPLEVEL);	
-	g_signal_connect (window2, "delete-event", G_CALLBACK (delete_event), NULL);
-	g_signal_connect (window2, "destroy", G_CALLBACK (destroy), NULL);
-	
-	gtk_container_set_border_width (GTK_CONTAINER (window2), 7);
-	
-	dialog = gtk_message_dialog_new (GTK_WINDOW(window2), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, 
-						"Are you sure you want to Quit");
-
-	/*Destroy the dialog when the user responds to it (e.g. clicks a button) */
-	g_signal_connect_swapped (dialog, "response", G_CALLBACK (gtk_widget_destroy), dialog);
-		
-	table = gtk_table_new(10, 4, TRUE);
-	gtk_container_add(GTK_CONTAINER(window2), table);
-	gtk_table_set_row_spacings(GTK_TABLE (table), 10);
-    	gtk_table_set_col_spacings(GTK_TABLE (table), 10);
-
-	label = gtk_label_new("Room");
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 0, 1);
-	gtk_widget_show(label);
-	
-	label = gtk_label_new("Members Currently in Room");
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 2, 3, 0, 1);
-	gtk_widget_show(label);
-
-	GtkWidget * scrolled_window;
-	GtkWidget * view;
-	GtkWidget * list;
-	GtkWidget * user;
-
-	list_rooms = gtk_list_store_new (1, G_TYPE_STRING);
-    	list = create_list ("Rooms", list_rooms);
-    	gtk_table_attach_defaults (GTK_TABLE (table), list, 0, 2, 0, 3);
-    	gtk_widget_show (list);
-
-	user_list = gtk_list_store_new (1, G_TYPE_STRING);
-	user = create_list ("Users", user_list);
-    	gtk_table_attach_defaults (GTK_TABLE (table), user, 2, 4, 0, 3);
-    	gtk_widget_show (user);
-
-	label = gtk_label_new("Messages:");
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 3, 4);
-	gtk_widget_show(label);
-	
-	scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-	mview = gtk_text_view_new();
-	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	gtk_table_attach_defaults(GTK_TABLE(table), scrolled_window, 0, 4, 4, 6);
-	gtk_container_add(GTK_CONTAINER (scrolled_window), mview);
-	gtk_widget_show_all(scrolled_window);
-
-	label = gtk_label_new ("Enter your Message");
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 6, 7);
-	gtk_widget_show(label);
-
-	scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-	sview = gtk_text_view_new();
-	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	gtk_table_attach_defaults(GTK_TABLE(table), scrolled_window, 0, 4, 7, 9);
-	gtk_container_add(GTK_CONTAINER (scrolled_window), sview);
-	gtk_widget_show_all (scrolled_window);
-
-	button = gtk_button_new_with_label ("SEND MESSAGE");
-	gtk_table_attach_defaults (GTK_TABLE(table), button, 0, 1, 9, 10);
-	g_signal_connect (button, "clicked", G_CALLBACK (send_event), (gpointer) "Send Message");
-	gtk_widget_show(button);
-
-	button = gtk_button_new_with_label ("ENTER ROOM");
-	gtk_table_attach_defaults (GTK_TABLE(table), button, 1, 2, 9, 10);
-	g_signal_connect (button, "clicked", G_CALLBACK (enter_room_event), (gpointer) "Enter Room");
-	gtk_widget_show(button);
-
-	button = gtk_button_new_with_label ("CREATE ROOM");
-	gtk_table_attach_defaults (GTK_TABLE(table), button, 2, 3, 9, 10);
-	g_signal_connect (button, "clicked", G_CALLBACK (create_room_event), (gpointer) "Create Room");
-	gtk_widget_show(button);
-
-	button = gtk_button_new_with_label ("LOGOUT");
-	gtk_table_attach_defaults (GTK_TABLE(table), button, 3, 4, 9, 10);
-	g_signal_connect (button, "clicked", G_CALLBACK (logout_event), (gpointer) "Logout");
-	gtk_widget_show(button);
-	
-	gtk_widget_show(table);
-
+    gtk_init(argc, argv);
+    
+    window1 = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(window1), "LOGIN");
+        
 	gtk_main ();
    
   	return 0;
