@@ -393,7 +393,19 @@ int main (int argc, char *argv[]) {
     gtk_init(argc, argv);
     
     window1 = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window1), "LOGIN");
+    gtk_window_set_title(GTK_WINDOW(window1), "LOGIN TO CLIENT");
+    
+    g_signal_connect(GTK_WINDOW(window), "delete-event", G_CALLBACK (delete_event), NULL);
+    g_signal_connect(GTK_WINDOW(window), "destroy", G_CALLBACK (destroy_event), NULL);
+    
+    gtk_container_set_border (GTK_CONTAINER(window), 10);
+    
+    GtkWidget * table = gtk_table_new(4, 3, TRUE);
+    gtk_container_add(GTK_CONTAINER(window), table);
+    
+    GtkWidget * label1 = gtk_label_new("USERNAME: ");
+    gtk_table_attach_defaults(GTK_TABLE(table), label1, 0, 1, 0, 1);
+    gtk_widget_show(label1); 
         
 	gtk_main ();
    
