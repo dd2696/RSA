@@ -390,6 +390,8 @@ static void logout_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
 }
    
 int main (int argc, char *argv[]) {
+    GtkWidget * button;
+        
     gtk_init(argc, argv);
     
     window1 = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -406,6 +408,23 @@ int main (int argc, char *argv[]) {
     GtkWidget * label1 = gtk_label_new("USERNAME: ");
     gtk_table_attach_defaults(GTK_TABLE(table), label1, 0, 1, 0, 1);
     gtk_widget_show(label1); 
+    
+    GtkWidget * label2 = gtk_label_new("PASSWORD: ");
+    gtk_table_attach_defaults(GTK_TABLE(table), label2, 0, 1, 1, 2);
+    gtk_widget_show(label2); 
+    
+   	button = gtk_button_new_with_label ("LOGIN");
+	g_signal_connect (button, "clicked", G_CALLBACK (login_event), (gpointer) "Login Button");
+	gtk_table_attach_defaults(GTK_TABLE(table), button, 1, 2, 3, 4);
+	gtk_widget_show (button);
+	
+	button = gtk_button_new_with_label ("ADD NEW USER");
+	g_signal_connect (button, "clicked", G_CALLBACK (add_event), (gpointer) "Add Button");
+	gtk_table_attach_defaults(GTK_TABLE(table), button, 2, 3, 3, 4);
+	gtk_widget_show (button);
+	
+	gtk_widget_show(table);
+	gtk_widget_show(window);
         
 	gtk_main ();
    
