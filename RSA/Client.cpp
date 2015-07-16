@@ -425,6 +425,10 @@ int main (int argc, char *argv[]) {
 	
 	gtk_widget_show(table);
 	gtk_widget_show(window);
+	
+	//*********WINDOW 2********
+	
+	
         
 	gtk_main ();
    
