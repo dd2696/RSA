@@ -31,6 +31,8 @@ int messageCount = 0;
  
 GtkWidget * window1;
 GtkWidget * window2;
+GtkWidget * window3;
+GtkWidget * window4;
 GtkWidget * dialog;
 
 const char * user_text;
@@ -325,11 +327,9 @@ static void login_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
 	char * pass = strdup (pass_text);
 	char * response = (char *) malloc(1000 * sizeof(char));
 	int n = sendCommand ("localhost", 1991, "CHECK-LOGIN", user, pass, "", response);
-	if(strcmp("Good", response) < 0) {
+	if(strcmp("OK", response) < 0) {
 		gtk_widget_hide(window1);
 		gtk_widget_show(window2);
-		//g_timeout_add(5000, (GSourceFunc) time_handler, gpointer(window2));
-  		//time_handler(window2);
 	}	
 }
 
@@ -340,11 +340,23 @@ static void add_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
 	char * response = (char *) malloc(1000 * sizeof(char));
 	int n = sendCommand ("localhost", 1991, "ADD-USER", user, pass, "", response);  
 	if(strcmp("OK", response) < 0) {
-		gtk_widget_hide(window);
+		gtk_widget_hide(window1);
 		gtk_widget_show(window2);
-		g_timeout_add(5000, (GSourceFunc) time_handler, gpointer(window2));
-  		time_handler(window2);
 	}
+}
+
+static void encryption_selected (GtkWidget * widget, GdkEvent * event, gpointer data) {
+	g_print ("Hello again - %s was pressed\n", (gchar *) data);
+	
+	gtk_widget_hide(window2);
+	gtk_widget_show(window3);
+}
+
+static void encryption_selected (GtkWidget * widget, GdkEvent * event, gpointer data) {
+	g_print ("Hello again - %s was pressed\n", (gchar *) data);
+	
+	gtk_widget_hide(window2);
+	gtk_widget_show(window4);
 }
 
 static void logout_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
@@ -388,13 +400,13 @@ int main (int argc, char *argv[]) {
     window1 = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window1), "LOGIN TO CLIENT");
     
-    g_signal_connect(GTK_WINDOW(window), "delete-event", G_CALLBACK (delete_event), NULL);
-    g_signal_connect(GTK_WINDOW(window), "destroy", G_CALLBACK (destroy_event), NULL);
+    g_signal_connect(GTK_WINDOW(window1), "delete-event", G_CALLBACK (delete_event), NULL);
+    g_signal_connect(GTK_WINDOW(window1), "destroy", G_CALLBACK (destroy_event), NULL);
     
-    gtk_container_set_border (GTK_CONTAINER(window), 10);
+    gtk_container_set_border (GTK_CONTAINER(window1), 10);
     
     GtkWidget * table = gtk_table_new(4, 3, TRUE);
-    gtk_container_add(GTK_CONTAINER(window), table);
+    gtk_container_add(GTK_CONTAINER(window1), table);
     
     GtkWidget * label1 = gtk_label_new("USERNAME: ");
     gtk_table_attach_defaults(GTK_TABLE(table), label1, 0, 1, 0, 1);
@@ -415,11 +427,59 @@ int main (int argc, char *argv[]) {
 	gtk_widget_show (button);
 	
 	gtk_widget_show(table);
-	gtk_widget_show(window);
+	gtk_widget_show(window1);
 	
 	//*********WINDOW 2********
+	// Choice of encryption/ decryption
 	
+	window2 = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(window2), "ENCRYPTION/DECRYPTION");
+    
+    g_signal_connect(GTK_WINDOW(window2), "delete-event", G_CALLBACK (delete_event), NULL);
+    g_signal_connect(GTK_WINDOW(window2), "destroy", G_CALLBACK (destroy_event), NULL);
+    
+    gtk_container_set_border (GTK_CONTAINER(window2), 10);
+    
+    table = gtk_table_new(3, 4, TRUE);
+    gtk_container_add(GTK_CONTAINER(window2), table);
 	
+	GtkWidget * radio1;
+	GtkWidget * radio2;
+	
+    radio1 = gtk_radio_button_new_with_label(NULL, "Encrypt a plaintext message");
+    g_signal_connect (GTK_TOGGELE_BUTTON(radio1), "toggled", G_CALLBACK (encryption_selected), NULL);
+    gtk_table_attach_defaults(GTK_TABLE(table), radio1, 0, 1, 0, 1);
+    
+	radio2 = gtk_radio_button_new_with_label(GTK_RADIO_BUTTON(radio1), "Decrypt a cipher text");
+	g_signal_connect (GTK_TOGGELE_BUTTON(radio2), "toggled", G_CALLBACK (decryption_selected), NULL);
+	gtk_table_attach_defaults(GTK_TABLE(table), radio2, 0, 1, 1, 2);
+	
+	gtk_widget_show(radio1);
+	gtk_widget_show(radio2);
+	
+   	gtk_widget_show(table);
+	
+	//*********WINDOW 3********
+	//Encryption
+	
+	window3 = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(window3), "ENCRYPTION");
+    
+    g_signal_connect(GTK_WINDOW(window3), "delete-event", G_CALLBACK (delete_event), NULL);
+    g_signal_connect(GTK_WINDOW(window3), "destroy", G_CALLBACK (destroy_event), NULL);
+    
+    gtk_container_set_border (GTK_CONTAINER(window3), 10);
+    
+    //*******WINDOW 4**********
+    //Decryption
+    
+   	window4 = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(window4), "ENCRYPTION");
+    
+    g_signal_connect(GTK_WINDOW(window4), "delete-event", G_CALLBACK (delete_event), NULL);
+    g_signal_connect(GTK_WINDOW(window4), "destroy", G_CALLBACK (destroy_event), NULL);
+    
+    gtk_container_set_border (GTK_CONTAINER(window4), 10);
         
 	gtk_main ();
    
