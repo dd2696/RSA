@@ -30,6 +30,7 @@ int messageCount = 0;
 #define MAX_RESPONSE (20 * 1024)
  
 GtkWidget * window1;
+GtkWidget * window2;
 GtkWidget * dialog;
 
 const char * user_text;
@@ -129,7 +130,7 @@ static void enter_callback_pass (GtkWidget * widget, GtkWidget * entry) {
 	printf("Password contents: %s\n", pass_text);
 }
 
-static void send_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
+/*static void send_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
 	g_print ("Hello again - %s was pressed\n", (gchar *) data);
 	char * user = strdup(user_text);
 	char * pass = strdup(pass_text);
@@ -152,17 +153,7 @@ static void send_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
 	if(strcmp("OK", response) < 0) {
 		gtk_text_buffer_set_text(GTK_TEXT_BUFFER(buffer), "", -1);		
 	}
-}
-
-static void tree_selection_changed_cb (GtkTreeSelection *selection, gpointer data) {
-        GtkTreeIter iter;
-        GtkTreeModel *model;
-
-        if (gtk_tree_selection_get_selected (selection, &model, &iter)) {
-                gtk_tree_model_get (model, &iter, 0, &room, -1);
-                g_print ("You selected %s\n", room);
-        }
-}
+}*/
 
 /* Add some text to our text widget - this is a callback that is invoked
 when our window is realized. We could also force our window to be
@@ -188,7 +179,7 @@ static void insert_text_enter (GtkTextBuffer * mbuffer, const char * initialText
 	gtk_text_buffer_insert (mbuffer, &iter, initialText,  -1);
 }
 
-static void process_message (char * input) {
+/*static void process_message (char * input) {
 	if (strcmp(input, "NO-NEW-MESSAGES\r\n") == 0) {
 		GtkTextBuffer * mbuffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW(mview));
 		insert_text (mbuffer, "");
@@ -252,7 +243,7 @@ static void process_message (char * input) {
 }
 	
 
-/* Create the list of "messages" */
+// Create the list of "messages" 
 static GtkWidget * create_list (const char * titleColumn, GtkListStore *model) {
     GtkWidget *scrolled_window;
     GtkWidget *tree_view;
@@ -261,7 +252,7 @@ static GtkWidget * create_list (const char * titleColumn, GtkListStore *model) {
 
     int i;
    
-    /* Create a new scrolled window, with scrollbars only if needed */
+    // Create a new scrolled window, with scrollbars only if needed //
     scrolled_window = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
 				    GTK_POLICY_AUTOMATIC, 
@@ -290,9 +281,9 @@ static GtkWidget * create_list (const char * titleColumn, GtkListStore *model) {
 	  		         GTK_TREE_VIEW_COLUMN (column));
 
     return scrolled_window;
-}
+}*/
 
-static gboolean time_handler(GtkWidget * widget) {
+/*static gboolean time_handler(GtkWidget * widget) {
 	printf("Time\n");
 	if (widget->window == NULL) {
 		return FALSE;
@@ -326,7 +317,7 @@ static gboolean time_handler_users(GtkWidget * widget) {
 	get_users_in_current_room();
 	get_messages_in_current_room();
 	return TRUE;
-}
+}*/
 
 static void login_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
 	g_print ("Hello again - %s was pressed\n", (gchar *) data);	
@@ -335,10 +326,10 @@ static void login_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
 	char * response = (char *) malloc(1000 * sizeof(char));
 	int n = sendCommand ("localhost", 1991, "CHECK-LOGIN", user, pass, "", response);
 	if(strcmp("Good", response) < 0) {
-		gtk_widget_hide(window);
+		gtk_widget_hide(window1);
 		gtk_widget_show(window2);
-		g_timeout_add(5000, (GSourceFunc) time_handler, gpointer(window2));
-  		time_handler(window2);
+		//g_timeout_add(5000, (GSourceFunc) time_handler, gpointer(window2));
+  		//time_handler(window2);
 	}	
 }
 
@@ -386,7 +377,7 @@ static void logout_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
 		int n = sendCommand ("localhost", 1991, "LEAVE-ROOM", user, pass, leaveRoom, response);
 	}
 	gtk_widget_hide(window2);
-	gtk_widget_show(window);
+	gtk_widget_show(window1);
 }
    
 int main (int argc, char *argv[]) {
