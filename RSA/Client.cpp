@@ -33,6 +33,13 @@ GtkWidget * window1;
 GtkWidget * window2;
 GtkWidget * window3;
 GtkWidget * window4;
+
+GtkWidget * p_entry;
+GtkWidget * q_entry;
+GtkWidget * e_entry;
+GtkWidget * m_entry;
+GtkWidget * c_entry;
+
 GtkWidget * dialog;
 
 const char * user_text;
@@ -351,6 +358,12 @@ static void encrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) 
 	char * pass = strdup(pass_text);
 	char * response = (char *) malloc(1000 * sizeof(char));
 	
+    char * p_text = gtk_entry_get_text(GTK_ENTRY(p_entry)); 
+    char * q_text = gtk_entry_get_text(GTK_ENTRY(q_entry)); 
+    char * e_text = gtk_entry_get_text(GTK_ENTRY(e_entry)); 
+    char * m_text = gtk_entry_get_text(GTK_ENTRY(m_entry)); 
+    
+    // Convert all elements into message
 }
 
 static void encryption_selected (GtkWidget * widget, GdkEvent * event, gpointer data) {
@@ -497,39 +510,52 @@ int main (int argc, char *argv[]) {
     gtk_table_attach_defaults(GTK_TABLE(table), label1, 0, 1, 0, 1);
     gtk_widget_show(label1);
     
-    entry = gtk_entry_new();
-	gtk_entry_set_visibility(GTK_ENTRY(entry), TRUE);
-	//Might not be necessary if you can directly get text when "ENCRYPT" is pressed
-    //g_signal_connect (entry, "activate", G_CALLBACK (enter_callback_pass), entry);
-	gtk_table_attach_defaults(GTK_TABLE(table), entry, 1, 3, 0, 1);
-	gtk_widget_show (entry);
+    p_entry = gtk_entry_new();
+	gtk_entry_set_visibility(GTK_ENTRY(p_entry), TRUE);
+	gtk_table_attach_defaults(GTK_TABLE(table), p_entry, 1, 3, 0, 1);
+	gtk_widget_show (p_entry);
     
     GtkWidget * label2 = gtk_label_new("q");
     gtk_table_attach_defaults(GTK_TABLE(table), label2, 4, 5, 0, 1);
     gtk_widget_show(label2);
     
-    entry = gtk_entry_new();
-	gtk_entry_set_visibility(GTK_ENTRY(entry), TRUE);
-	//Might not be necessary if you can directly get text when "ENCRYPT" is pressed
-    //g_signal_connect (entry, "activate", G_CALLBACK (enter_callback_pass), entry);
-	gtk_table_attach_defaults(GTK_TABLE(table), entry, 5, 7, 0, 1);
-	gtk_widget_show (entry);
+    q_entry = gtk_entry_new();
+	gtk_entry_set_visibility(GTK_ENTRY(q_entry), TRUE);
+	gtk_table_attach_defaults(GTK_TABLE(table), q_entry, 5, 7, 0, 1);
+	gtk_widget_show (q_entry);
 	
 	GtkWidget * label3 = gtk_label_new("e");
     gtk_table_attach_defaults(GTK_TABLE(table), label3, 1, 2, 1, 2);
     gtk_widget_show(label3);
     
-    entry = gtk_entry_new();
-	gtk_entry_set_visibility(GTK_ENTRY(entry), TRUE);
-	//Might not be necessary if you can directly get text when "ENCRYPT" is pressed
-    //g_signal_connect (entry, "activate", G_CALLBACK (enter_callback_pass), entry);
-	gtk_table_attach_defaults(GTK_TABLE(table), entry, 2, 5, 1, 2);
-	gtk_widget_show (entry);
+    e_entry = gtk_entry_new();
+	gtk_entry_set_visibility(GTK_ENTRY(e_entry), TRUE);
+	gtk_table_attach_defaults(GTK_TABLE(table), e_entry, 2, 5, 1, 2);
+	gtk_widget_show (e_entry);
+	
+	GtkWidget * label4 = gtk_label_new("Message");
+    gtk_table_attach_defaults(GTK_TABLE(table), label4, 0, 1, 2, 3);
+    gtk_widget_show(label4);
+    
+    m_entry = gtk_entry_new();
+	gtk_entry_set_visibility(GTK_ENTRY(m_entry), TRUE);
+	gtk_table_attach_defaults(GTK_TABLE(table), m_entry, 1, 5, 2, 3);
+	gtk_widget_show (m_entry);
 	
 	button = gtk_button_new_with_label ("ADD NEW USER");
 	g_signal_connect (button, "clicked", G_CALLBACK (encrypt_event), (gpointer) "Encrypt Button");
-	gtk_table_attach_defaults(GTK_TABLE(table), button, 2, 3, 3, 4);
+	gtk_table_attach_defaults(GTK_TABLE(table), button, 2, 3, 4, 5);
 	gtk_widget_show (button);
+	
+	GtkWidget * label5 = gtk_label_new("Cipher Text");
+    gtk_table_attach_defaults(GTK_TABLE(table), label5, 0, 1, 6, 7);
+    gtk_widget_show(label5);
+    
+    c_entry = gtk_entry_new();
+	gtk_entry_set_visibility(GTK_ENTRY(c_entry), TRUE);
+	gtk_entry_set_text(GTK_ENTRY(c_entry), "");
+	gtk_table_attach_defaults(GTK_TABLE(table), c_entry, 1, 7, 6, 7);
+	gtk_widget_show (c_entry);
     
     //*******WINDOW 4**********
     //Decryption
