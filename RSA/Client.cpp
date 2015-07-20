@@ -39,6 +39,13 @@ GtkWidget * q_entry;
 GtkWidget * e_entry;
 GtkWidget * m_entry;
 GtkWidget * c_entry;
+GtkWidget * private_entry;
+GtkWidget * public_entry;
+
+GtkWidget * d_entry;
+GtkWidget * n_entry;
+GtkWidget * pln_entry;
+GtkWidget * cry_entry;
 
 GtkWidget * dialog;
 
@@ -503,7 +510,7 @@ int main (int argc, char *argv[]) {
     
     gtk_container_set_border (GTK_CONTAINER(window3), 10);
     
-    GtkWidget * table = gtk_table_new(7, 7, TRUE);
+    GtkWidget * table = gtk_table_new(8, 7, TRUE);
     gtk_container_add(GTK_CONTAINER(window3), table);
     
     GtkWidget * label1 = gtk_label_new("p");
@@ -556,6 +563,28 @@ int main (int argc, char *argv[]) {
 	gtk_entry_set_text(GTK_ENTRY(c_entry), "");
 	gtk_table_attach_defaults(GTK_TABLE(table), c_entry, 1, 7, 6, 7);
 	gtk_widget_show (c_entry);
+	
+	GtkWidget * label6 = gtk_label_new("Public Key");
+    gtk_table_attach_defaults(GTK_TABLE(table), label6, 0, 1, 7, 8);
+    gtk_widget_show(label6);
+    
+    public_entry = gtk_entry_new();
+	gtk_entry_set_visibility(GTK_ENTRY(public_entry), TRUE);
+	gtk_entry_set_text(GTK_ENTRY(public_entry), "");
+	gtk_table_attach_defaults(GTK_TABLE(table), public_entry, 1, 3, 7, 8);
+	gtk_widget_show (public_entry);
+	
+	GtkWidget * label7 = gtk_label_new("Private Key");
+    gtk_table_attach_defaults(GTK_TABLE(table), label7, 4, 5, 7, 8);
+    gtk_widget_show(label7);
+    
+    private_entry = gtk_entry_new();
+	gtk_entry_set_visibility(GTK_ENTRY(private_entry), TRUE);
+	gtk_entry_set_text(GTK_ENTRY(private_entry), "");
+	gtk_table_attach_defaults(GTK_TABLE(table), private_entry, 5, 7, 7, 8);
+	gtk_widget_show (private_entry);
+	
+	gtk_widget_show (table);
     
     //*******WINDOW 4**********
     //Decryption
@@ -567,6 +596,52 @@ int main (int argc, char *argv[]) {
     g_signal_connect(GTK_WINDOW(window4), "destroy", G_CALLBACK (destroy_event), NULL);
     
     gtk_container_set_border (GTK_CONTAINER(window4), 10);
+    
+    GtkWidget * table = gtk_table_new(4, 7, TRUE);
+    gtk_container_add(GTK_CONTAINER(window3), table);
+    
+    GtkWidget * label8 = gtk_label_new("d");
+    gtk_table_attach_defaults(GTK_TABLE(table), label8, 0, 1, 0, 1);
+    gtk_widget_show(label8);
+    
+    d_entry = gtk_entry_new();
+	gtk_entry_set_visibility(GTK_ENTRY(d_entry), TRUE);
+	gtk_table_attach_defaults(GTK_TABLE(table), d_entry, 1, 3, 0, 1);
+	gtk_widget_show (d_entry);
+    
+    GtkWidget * label9 = gtk_label_new("n");
+    gtk_table_attach_defaults(GTK_TABLE(table), label9, 4, 5, 0, 1);
+    gtk_widget_show(label9);
+    
+    n_entry = gtk_entry_new();
+	gtk_entry_set_visibility(GTK_ENTRY(n_entry), TRUE);
+	gtk_table_attach_defaults(GTK_TABLE(table), n_entry, 5, 7, 0, 1);
+	gtk_widget_show (n_entry);
+	
+	GtkWidget * label10 = gtk_label_new("Crypted Text");
+    gtk_table_attach_defaults(GTK_TABLE(table), label10, 0, 1, 1, 2);
+    gtk_widget_show(label0);
+    
+    cry_entry = gtk_entry_new();
+	gtk_entry_set_visibility(GTK_ENTRY(cry_entry), TRUE);
+	gtk_entry_set_text(GTK_ENTRY(cry_entry), "");
+	gtk_table_attach_defaults(GTK_TABLE(table), cry_entry, 1, 7, 1, 2);
+	gtk_widget_show (cry_entry);
+	
+	GtkWidget * button3 = gtk_button_new_with_label ("DECRYPT");
+	g_signal_connect (button3, "clicked", G_CALLBACK (decrypt_event), (gpointer) "Decrypt Button");
+	gtk_table_attach_defaults(GTK_TABLE(table), button3, 3, 4, 2, 3);
+	gtk_widget_show (button3);
+	
+	GtkWidget * label11 = gtk_label_new("Plain Text");
+    gtk_table_attach_defaults(GTK_TABLE(table), label11, 0, 1, 3, 4);
+    gtk_widget_show(label11);
+    
+    pln_entry = gtk_entry_new();
+	gtk_entry_set_visibility(GTK_ENTRY(pln_entry), TRUE);
+	gtk_entry_set_text(GTK_ENTRY(pln_entry), "");
+	gtk_table_attach_defaults(GTK_TABLE(table), pln_entry, 1, 7, 3, 4);
+	gtk_widget_show (pln_entry);
         
 	gtk_main ();
    
