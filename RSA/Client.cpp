@@ -256,47 +256,6 @@ static void insert_text_enter (GtkTextBuffer * mbuffer, const char * initialText
  		GtkTextBuffer * mbuffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mview));
 		insert_text (mbuffer, final_message);
 	}
-}
-	
-
-// Create the list of "messages" 
-static GtkWidget * create_list (const char * titleColumn, GtkListStore *model) {
-    GtkWidget *scrolled_window;
-    GtkWidget *tree_view;
-    GtkCellRenderer *cell;
-    GtkTreeViewColumn *column;
-
-    int i;
-   
-    // Create a new scrolled window, with scrollbars only if needed //
-    scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
-				    GTK_POLICY_AUTOMATIC, 
-				    GTK_POLICY_AUTOMATIC);
-   
-    tree_view = gtk_tree_view_new ();
-    gtk_container_add (GTK_CONTAINER (scrolled_window), tree_view);
-    gtk_tree_view_set_model (GTK_TREE_VIEW (tree_view), GTK_TREE_MODEL (model));
-
-    GtkTreeSelection *select;
-
-    select = gtk_tree_view_get_selection (GTK_TREE_VIEW (tree_view));
-    gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
-    g_signal_connect (G_OBJECT (select), "changed", G_CALLBACK (tree_selection_changed_cb), NULL);    
-
-    gtk_widget_show (tree_view);
-   
-    cell = gtk_cell_renderer_text_new ();
-
-    column = gtk_tree_view_column_new_with_attributes (titleColumn,
-                                                       cell,
-                                                       "text", 0,
-                                                       NULL);
-  
-    gtk_tree_view_append_column (GTK_TREE_VIEW (tree_view),
-	  		         GTK_TREE_VIEW_COLUMN (column));
-
-    return scrolled_window;
 }*/
 
 /*static gboolean time_handler(GtkWidget * widget) {
@@ -373,6 +332,20 @@ static void encrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) 
     // Convert all elements into message
 }
 
+static void decrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
+    g_print ("Hello again - %s was pressed\n", (gchar *) data);
+	char * user = strdup(user_text);
+	char * pass = strdup(pass_text);
+	char * response = (char *) malloc(1000 * sizeof(char));
+	
+	char * d_text = gtk_entry_get_text(GTK_ENTRY(d_entry)); 
+	char * n_text = gtk_entry_get_text(GTK_ENTRY(n_entry));
+	char * cry_text = gtk_entry_get_text(GTK_ENTRY(cry_entry));
+
+    // Convert to message
+
+}
+
 static void encryption_selected (GtkWidget * widget, GdkEvent * event, gpointer data) {
 	g_print ("Hello again - %s was pressed\n", (gchar *) data);
 	
@@ -380,7 +353,7 @@ static void encryption_selected (GtkWidget * widget, GdkEvent * event, gpointer 
 	gtk_widget_show(window3);
 }
 
-static void encryption_selected (GtkWidget * widget, GdkEvent * event, gpointer data) {
+static void decryption_selected (GtkWidget * widget, GdkEvent * event, gpointer data) {
 	g_print ("Hello again - %s was pressed\n", (gchar *) data);
 	
 	gtk_widget_hide(window2);
