@@ -516,9 +516,15 @@ void RSAServer::encryptMessage(int fd, const char * user, const char * password,
         // Encrypt message. Input for p and q is perfect
         else {
               int n = p * q;   
-              char * enc_string = (char *) malloc(strlen(str_m) * 2 * sizeof(char));
+              char * enc_string = (char *) malloc(10000 * sizeof(char));
               int ctr_string = 0;
               int d = modInverse(e, phi);
+              char d_string[100];
+              sprintf(d_string, "%d", d);             
+              
+              ctr_string += strlen(d_string) + 1;
+              enc_string = strcpy(enc_string, d_string);
+              enc_string = strcpy(enc_string, " ");
               
               for (int k = 0; k < strlen(str_m); k++) {               
                   int ascii = (int) str_m[k];
@@ -534,6 +540,8 @@ void RSAServer::encryptMessage(int fd, const char * user, const char * password,
                      ctr_string += 2;
                   }
               }
+              
+              enc_string[ctr_string + 1] = '\0';
               // Write the encrypted message into string
               write (fd, enc_string, strlen(enc_string));  
         }

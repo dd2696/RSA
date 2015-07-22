@@ -345,8 +345,32 @@ static void encrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) 
         gtk_entry_set_text(GTK_ENTRY(pln_text), response);
     }
     else {
-        gtk_entry_set_text(GTK_ENTRY(pln_text), response);
+        // Get value of d - Private key from Server
+        
+        
         // Set value for public, private key
+        int p_len = strlen(p_text);
+        int p = 0;
+        int i = 0;
+        while (i <= p_len - 1) {
+              p += pow(10, i) * (str_p[i] - 48);
+              i++;
+        }
+        
+        int q_len = strlen(str_q);
+        int q = 0;
+        i = 0;
+        while (i <= q_len - 1) {
+              q += pow(10, i) * (str_q[i] - 48);
+              i++;
+        }
+        
+        int n = p * q;
+        char sn_str[15];
+        sprintf(n_str, "%d", n);
+        gtk_entry_set_text(GTK_ENTRY(public_entry), n_str);
+        
+        
     }
                          
 }
