@@ -495,17 +495,17 @@ void RSAServer::encryptMessage(int fd, const char * user, const char * password,
         int phi = (p - 1) * (q - 1);
         
         if (p < 11 || p > 1000 || isPrime(p) != 0) {
-              write(fd, "Incorrect Input for p", 22);
+              write(fd, "ERROR: Incorrect Input for p", 22);
               return;
         }
         
         else if (q < 11 || q == p || q > 1000 || isPrime(q) != 0) {
-              write(fd, "Incorrect Input for q", 22);
+              write(fd, "ERROR: Incorrect Input for q", 22);
               return;
         }
                 
         else if (gcdCalculator(e, phi) != 1 || e <= 1 || e >= phi) {
-              write(fd, "Incorrect Input for e", 22);
+              write(fd, "ERROR: Incorrect Input for e", 22);
               return;
         }  
         

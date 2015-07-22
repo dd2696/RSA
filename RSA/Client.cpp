@@ -320,6 +320,7 @@ static void add_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
 
 static void encrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) {     
     g_print ("Hello again - %s was pressed\n", (gchar *) data);
+    gtk_entry_set_text(GTK_ENTRY(pln_text), "");
 	char * user = strdup(user_text);
 	char * pass = strdup(pass_text);
 	char * response = (char *) malloc(1000 * sizeof(char));
@@ -330,6 +331,24 @@ static void encrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) 
     char * m_text = gtk_entry_get_text(GTK_ENTRY(m_entry)); 
     
     // Convert all elements into message
+    char * args = strdup(p_text);
+    args = strcpy(args, " ");
+    args = strcpy(args, q_text);
+    args = strcpy(args, " ");
+    args = strcpy(args, e_text);
+    args = strcpy(args, " ");
+    args = strcpy(args, m_text);
+    
+    int n = sendCommand ("localhost", 1991, "ENCRYPT-MESSAGE", user, pass, args, response);
+    
+    if (strncmp(response, "ERROR", 5) == 0) {
+        gtk_entry_set_text(GTK_ENTRY(pln_text), response);
+    }
+    else {
+        gtk_entry_set_text(GTK_ENTRY(pln_text), response);
+        // Set value for public, private key
+    }
+                         
 }
 
 static void decrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
@@ -343,7 +362,14 @@ static void decrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) 
 	char * cry_text = gtk_entry_get_text(GTK_ENTRY(cry_entry));
 
     // Convert to message
+    char * args = strdup(d_text);
+    args = strcpy(args, " ");
+    args = strcpy(args, n_text);
+    args = strcpy(args, " ");
+    args = strcpy(args, cry_text);
 
+    int n = sendCommand ("localhost", 1991, "DECRYPT-MESSAGE", user, pass, args, response);
+    
 }
 
 static void encryption_selected (GtkWidget * widget, GdkEvent * event, gpointer data) {
@@ -522,7 +548,7 @@ int main (int argc, char *argv[]) {
 	gtk_table_attach_defaults(GTK_TABLE(table), m_entry, 1, 5, 2, 3);
 	gtk_widget_show (m_entry);
 	
-	button = gtk_button_new_with_label ("ADD NEW USER");
+	button = gtk_button_new_with_label ("Encrypt");
 	g_signal_connect (button, "clicked", G_CALLBACK (encrypt_event), (gpointer) "Encrypt Button");
 	gtk_table_attach_defaults(GTK_TABLE(table), button, 2, 3, 4, 5);
 	gtk_widget_show (button);
