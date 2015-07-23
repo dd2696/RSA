@@ -668,12 +668,12 @@ void RSAServer::decryptMessage (int fd, const char * user, const char * password
         }
         
         if (d <= 0 || n <= 1) {
-              write(fd, "Incorrect Input for d/n", 24);
+              write(fd, "ERROR: Incorrect Input for d/n", 24);
               return;
         }
         
         else if (strcmp(str_m, "") == 0) {
-             write(fd, "Incorrect input for message", 27);
+             write(fd, "ERROR: Incorrect input for message", 27);
              return;
         }
         

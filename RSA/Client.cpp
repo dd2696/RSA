@@ -320,7 +320,7 @@ static void add_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
 
 static void encrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) {     
     g_print ("Hello again - %s was pressed\n", (gchar *) data);
-    gtk_entry_set_text(GTK_ENTRY(pln_text), "");
+    gtk_entry_set_text(GTK_ENTRY(c_text), "");
 	char * user = strdup(user_text);
 	char * pass = strdup(pass_text);
 	char * response = (char *) malloc(1000 * sizeof(char));
@@ -342,12 +342,22 @@ static void encrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) 
     int n = sendCommand ("localhost", 1991, "ENCRYPT-MESSAGE", user, pass, args, response);
     
     if (strncmp(response, "ERROR", 5) == 0) {
-        gtk_entry_set_text(GTK_ENTRY(pln_text), response);
+        gtk_entry_set_text(GTK_ENTRY(c_text), response);
     }
     else {
         // Get value of d - Private key from Server
+        char * b = response;
+        char d_string[100];
+        i = 0;
+        while (*b != ' ') {
+            d_string[i++] = *b;
+            b++;
+        }
+        d_string[i] = '\0';
         
+        gtk_entry_set_text(GTK_ENTRY(private_entry), d_string); 
         
+        b++;
         // Set value for public, private key
         int p_len = strlen(p_text);
         int p = 0;
@@ -370,13 +380,14 @@ static void encrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) 
         sprintf(n_str, "%d", n);
         gtk_entry_set_text(GTK_ENTRY(public_entry), n_str);
         
-        
-    }
-                         
+        gtk_entry_set_text(GTK_ENTRY(c_text), b);
+        checkRepeatProcess(window3);
+    }                    
 }
 
 static void decrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
     g_print ("Hello again - %s was pressed\n", (gchar *) data);
+    gtk_entry_set_text(GTK_ENTRY(pln_text), "");
 	char * user = strdup(user_text);
 	char * pass = strdup(pass_text);
 	char * response = (char *) malloc(1000 * sizeof(char));
@@ -394,7 +405,37 @@ static void decrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) 
 
     int n = sendCommand ("localhost", 1991, "DECRYPT-MESSAGE", user, pass, args, response);
     
+    if (strncmp(response, "ERROR", 5) == 0) {
+        gtk_entry_set_text(GTK_ENTRY(pln_text), response);
+    }
+    else {
+        gtk_entry_set_text(GTK_ENTRY(pln_text), response);
+        checkRepeatProcess(window4);
+    } 
 }
+
+static void checkRepeatProcess(GtkWidget * window) {
+       GtkWidget * dialog = gtk_dialog_new_with_buttons("Do you want to start again",
+                                                        GTK_WINDOW(window),
+                                                        GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+                                                        GTK_STOCK_OK, 
+                                                        GTK_RESPONSE_ACCEPT,
+                                                        GTK_STOCK_CANCEL,
+                                                        GTK_RESPONSE_REJECT);
+                                                                
+       gint result = gtk_dialog_run (GTK_DIALOG (dialog));
+       switch (result) {
+              case GTK_RESPONSE_ACCEPT:
+                                       gtk_widget_show(window2);
+                                       gtk_widget_hide(GTK_WIDGET(window));
+                                       break;
+                                       
+              case GTK_RESPONSE_REJECT:
+                                       break;
+              default:
+                      break;
+      }
+    gtk_widget_destroy (dialog);
 
 static void encryption_selected (GtkWidget * widget, GdkEvent * event, gpointer data) {
 	g_print ("Hello again - %s was pressed\n", (gchar *) data);
@@ -416,29 +457,7 @@ static void logout_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
 	char * pass = strdup(pass_text);
 	
 	char * response = (char *) malloc(1000 * sizeof(char));
-
-	char * p = roomsEntered;
-	while (*p != '\0') {
-		char * leaveRoom = (char *) malloc (100 * sizeof(char));
-		char * q = leaveRoom;
-
-		while (*p != '\n') {
-			*q = *p;
-			q++;
-			p++;
-		}
-		*q = '\0';
-		p++;	
 	
-		char * leaveMessage = (char *) malloc (1000 * sizeof(char));
-		leaveMessage = strcpy(leaveMessage, leaveRoom);
-		leaveMessage = strcat(leaveMessage, " ");
-		leaveMessage = strcat(leaveMessage, "LEFT: ");
-		leaveMessage = strcat(leaveMessage, user);
-		leaveMessage = strcat(leaveMessage, " has left the room!");
-		int m = sendCommand ("localhost", 1991, "SEND-MESSAGE", user, pass, leaveMessage, response);
-		int n = sendCommand ("localhost", 1991, "LEAVE-ROOM", user, pass, leaveRoom, response);
-	}
 	gtk_widget_hide(window2);
 	gtk_widget_show(window1);
 }
@@ -613,7 +632,7 @@ int main (int argc, char *argv[]) {
     //Decryption
     
    	window4 = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window4), "ENCRYPTION");
+    gtk_window_set_title(GTK_WINDOW(window4), "DECRYPTION");
     
     g_signal_connect(GTK_WINDOW(window4), "delete-event", G_CALLBACK (delete_event), NULL);
     g_signal_connect(GTK_WINDOW(window4), "destroy", G_CALLBACK (destroy_event), NULL);
