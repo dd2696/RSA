@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <math.h>
 
 static char buffer[256];
 
@@ -132,7 +133,7 @@ static gboolean delete_event (GtkWidget *widget, GdkEvent  *event, gpointer data
 	return FALSE;
 }
 
-static void destroy (GtkWidget * widget, gpointer data) {
+static void destroy_event (GtkWidget * widget, gpointer data) {
 	gtk_main_quit ();
 }
 
@@ -318,17 +319,42 @@ static void add_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
 	}
 }
 
+static void checkRepeatProcess(GtkWidget * window) {
+       GtkWidget * dialog = gtk_dialog_new_with_buttons("Do you want to start again",
+                                                        GTK_WINDOW(window),
+                                                        GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+                                                        GTK_STOCK_OK, 
+                                                        GTK_RESPONSE_ACCEPT,
+                                                        GTK_STOCK_CANCEL,
+                                                        GTK_RESPONSE_REJECT,
+                                                        NULL);
+                                                                
+       gint result = gtk_dialog_run (GTK_DIALOG (dialog));
+       switch (result) {
+              case GTK_RESPONSE_ACCEPT:
+                                       gtk_widget_show(window2);
+                                       gtk_widget_hide(GTK_WIDGET(window));
+                                       break;
+                                       
+              case GTK_RESPONSE_REJECT:
+                                       break;
+              default:
+                      break;
+      }
+    gtk_widget_destroy (dialog);
+}
+
 static void encrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) {     
     g_print ("Hello again - %s was pressed\n", (gchar *) data);
-    gtk_entry_set_text(GTK_ENTRY(c_text), "");
+    gtk_entry_set_text(GTK_ENTRY(c_entry), "");
 	char * user = strdup(user_text);
 	char * pass = strdup(pass_text);
 	char * response = (char *) malloc(1000 * sizeof(char));
 	
-    char * p_text = gtk_entry_get_text(GTK_ENTRY(p_entry)); 
-    char * q_text = gtk_entry_get_text(GTK_ENTRY(q_entry)); 
-    char * e_text = gtk_entry_get_text(GTK_ENTRY(e_entry)); 
-    char * m_text = gtk_entry_get_text(GTK_ENTRY(m_entry)); 
+    const gchar * p_text = gtk_entry_get_text(GTK_ENTRY(p_entry)); 
+    const gchar * q_text = gtk_entry_get_text(GTK_ENTRY(q_entry)); 
+    const gchar * e_text = gtk_entry_get_text(GTK_ENTRY(e_entry)); 
+    const gchar * m_text = gtk_entry_get_text(GTK_ENTRY(m_entry)); 
     
     // Convert all elements into message
     char * args = strdup(p_text);
@@ -342,13 +368,13 @@ static void encrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) 
     int n = sendCommand ("localhost", 1991, "ENCRYPT-MESSAGE", user, pass, args, response);
     
     if (strncmp(response, "ERROR", 5) == 0) {
-        gtk_entry_set_text(GTK_ENTRY(c_text), response);
+        gtk_entry_set_text(GTK_ENTRY(c_entry), response);
     }
     else {
         // Get value of d - Private key from Server
         char * b = response;
         char d_string[100];
-        i = 0;
+        int i = 0;
         while (*b != ' ') {
             d_string[i++] = *b;
             b++;
@@ -361,22 +387,22 @@ static void encrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) 
         // Set value for public, private key
         int p_len = strlen(p_text);
         int p = 0;
-        int i = 0;
+        i = 0;
         while (i <= p_len - 1) {
-              p += pow(10, i) * (str_p[i] - 48);
+              p += pow(10, i) * (p_text[i] - 48);
               i++;
         }
         
-        int q_len = strlen(str_q);
+        int q_len = strlen(q_text);
         int q = 0;
         i = 0;
         while (i <= q_len - 1) {
-              q += pow(10, i) * (str_q[i] - 48);
+              q += pow(10, i) * (q_text[i] - 48);
               i++;
         }
         
         int n = p * q;
-        char sn_str[15];
+        char n_str[15];
         sprintf(n_str, "%d", n);
         gtk_entry_set_text(GTK_ENTRY(public_entry), n_str);
         
@@ -387,14 +413,14 @@ static void encrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) 
 
 static void decrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
     g_print ("Hello again - %s was pressed\n", (gchar *) data);
-    gtk_entry_set_text(GTK_ENTRY(pln_text), "");
+    gtk_entry_set_text(GTK_ENTRY(pln_entry), "");
 	char * user = strdup(user_text);
 	char * pass = strdup(pass_text);
 	char * response = (char *) malloc(1000 * sizeof(char));
 	
-	char * d_text = gtk_entry_get_text(GTK_ENTRY(d_entry)); 
-	char * n_text = gtk_entry_get_text(GTK_ENTRY(n_entry));
-	char * cry_text = gtk_entry_get_text(GTK_ENTRY(cry_entry));
+	const gchar * d_text = gtk_entry_get_text(GTK_ENTRY(d_entry)); 
+	const gchar * n_text = gtk_entry_get_text(GTK_ENTRY(n_entry));
+	const gchar * cry_text = gtk_entry_get_text(GTK_ENTRY(cry_entry));
 
     // Convert to message
     char * args = strdup(d_text);
@@ -414,28 +440,7 @@ static void decrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) 
     } 
 }
 
-static void checkRepeatProcess(GtkWidget * window) {
-       GtkWidget * dialog = gtk_dialog_new_with_buttons("Do you want to start again",
-                                                        GTK_WINDOW(window),
-                                                        GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-                                                        GTK_STOCK_OK, 
-                                                        GTK_RESPONSE_ACCEPT,
-                                                        GTK_STOCK_CANCEL,
-                                                        GTK_RESPONSE_REJECT);
-                                                                
-       gint result = gtk_dialog_run (GTK_DIALOG (dialog));
-       switch (result) {
-              case GTK_RESPONSE_ACCEPT:
-                                       gtk_widget_show(window2);
-                                       gtk_widget_hide(GTK_WIDGET(window));
-                                       break;
-                                       
-              case GTK_RESPONSE_REJECT:
-                                       break;
-              default:
-                      break;
-      }
-    gtk_widget_destroy (dialog);
+
 
 static void encryption_selected (GtkWidget * widget, GdkEvent * event, gpointer data) {
 	g_print ("Hello again - %s was pressed\n", (gchar *) data);
@@ -529,11 +534,11 @@ int main (int argc, char *argv[]) {
 	GtkWidget * radio2;
 	
     radio1 = gtk_radio_button_new_with_label(NULL, "Encrypt a plaintext message");
-    g_signal_connect (GTK_TOGGELE_BUTTON(radio1), "toggled", G_CALLBACK (encryption_selected), NULL);
+    g_signal_connect (GTK_TOGGLE_BUTTON(radio1), "toggled", G_CALLBACK (encryption_selected), NULL);
     gtk_table_attach_defaults(GTK_TABLE(table), radio1, 0, 1, 0, 1);
     
 	radio2 = gtk_radio_button_new_with_label(GTK_RADIO_BUTTON(radio1), "Decrypt a cipher text");
-	g_signal_connect (GTK_TOGGELE_BUTTON(radio2), "toggled", G_CALLBACK (decryption_selected), NULL);
+	g_signal_connect (GTK_TOGGLE_BUTTON(radio2), "toggled", G_CALLBACK (decryption_selected), NULL);
 	gtk_table_attach_defaults(GTK_TABLE(table), radio2, 0, 1, 1, 2);
 	
 	gtk_widget_show(radio1);
@@ -552,10 +557,10 @@ int main (int argc, char *argv[]) {
     
     gtk_container_set_border (GTK_CONTAINER(window3), 10);
     
-    GtkWidget * table = gtk_table_new(8, 7, TRUE);
+    table = gtk_table_new(8, 7, TRUE);
     gtk_container_add(GTK_CONTAINER(window3), table);
     
-    GtkWidget * label1 = gtk_label_new("p");
+    label1 = gtk_label_new("p");
     gtk_table_attach_defaults(GTK_TABLE(table), label1, 0, 1, 0, 1);
     gtk_widget_show(label1);
     
@@ -564,7 +569,7 @@ int main (int argc, char *argv[]) {
 	gtk_table_attach_defaults(GTK_TABLE(table), p_entry, 1, 3, 0, 1);
 	gtk_widget_show (p_entry);
     
-    GtkWidget * label2 = gtk_label_new("q");
+    label2 = gtk_label_new("q");
     gtk_table_attach_defaults(GTK_TABLE(table), label2, 4, 5, 0, 1);
     gtk_widget_show(label2);
     
@@ -639,7 +644,7 @@ int main (int argc, char *argv[]) {
     
     gtk_container_set_border (GTK_CONTAINER(window4), 10);
     
-    GtkWidget * table = gtk_table_new(4, 7, TRUE);
+    table = gtk_table_new(4, 7, TRUE);
     gtk_container_add(GTK_CONTAINER(window3), table);
     
     GtkWidget * label8 = gtk_label_new("d");
@@ -662,7 +667,7 @@ int main (int argc, char *argv[]) {
 	
 	GtkWidget * label10 = gtk_label_new("Crypted Text");
     gtk_table_attach_defaults(GTK_TABLE(table), label10, 0, 1, 1, 2);
-    gtk_widget_show(label0);
+    gtk_widget_show(labell0);
     
     cry_entry = gtk_entry_new();
 	gtk_entry_set_visibility(GTK_ENTRY(cry_entry), TRUE);
