@@ -406,7 +406,7 @@ static void encrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) 
         sprintf(n_str, "%d", n);
         gtk_entry_set_text(GTK_ENTRY(public_entry), n_str);
         
-        gtk_entry_set_text(GTK_ENTRY(c_text), b);
+        gtk_entry_set_text(GTK_ENTRY(c_entry), b);
         checkRepeatProcess(window3);
     }                    
 }
@@ -432,10 +432,10 @@ static void decrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) 
     int n = sendCommand ("localhost", 1991, "DECRYPT-MESSAGE", user, pass, args, response);
     
     if (strncmp(response, "ERROR", 5) == 0) {
-        gtk_entry_set_text(GTK_ENTRY(pln_text), response);
+        gtk_entry_set_text(GTK_ENTRY(pln_entry), response);
     }
     else {
-        gtk_entry_set_text(GTK_ENTRY(pln_text), response);
+        gtk_entry_set_text(GTK_ENTRY(pln_entry), response);
         checkRepeatProcess(window4);
     } 
 }
@@ -467,11 +467,11 @@ static void logout_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
 	gtk_widget_show(window1);
 }
    
-int main (int argc, char *argv[]) {
+int main (int argc, char ** argv) {
     GtkWidget * button;
     GtkWidget * entry;
         
-    gtk_init(argc, argv);
+    gtk_init(argc, *argv);
     
     window1 = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window1), "LOGIN TO CLIENT");
@@ -479,7 +479,7 @@ int main (int argc, char *argv[]) {
     g_signal_connect(GTK_WINDOW(window1), "delete-event", G_CALLBACK (delete_event), NULL);
     g_signal_connect(GTK_WINDOW(window1), "destroy", G_CALLBACK (destroy_event), NULL);
     
-    gtk_container_set_border (GTK_CONTAINER(window1), 10);
+    gtk_container_set_border_width (GTK_CONTAINER(window1), 10);
     
     GtkWidget * table = gtk_table_new(4, 3, TRUE);
     gtk_container_add(GTK_CONTAINER(window1), table);
@@ -525,7 +525,7 @@ int main (int argc, char *argv[]) {
     g_signal_connect(GTK_WINDOW(window2), "delete-event", G_CALLBACK (delete_event), NULL);
     g_signal_connect(GTK_WINDOW(window2), "destroy", G_CALLBACK (destroy_event), NULL);
     
-    gtk_container_set_border (GTK_CONTAINER(window2), 10);
+    gtk_container_set_border_width (GTK_CONTAINER(window2), 10);
     
     table = gtk_table_new(3, 4, TRUE);
     gtk_container_add(GTK_CONTAINER(window2), table);
@@ -537,7 +537,7 @@ int main (int argc, char *argv[]) {
     g_signal_connect (GTK_TOGGLE_BUTTON(radio1), "toggled", G_CALLBACK (encryption_selected), NULL);
     gtk_table_attach_defaults(GTK_TABLE(table), radio1, 0, 1, 0, 1);
     
-	radio2 = gtk_radio_button_new_with_label(GTK_RADIO_BUTTON(radio1), "Decrypt a cipher text");
+	radio2 = gtk_radio_button_new_with_label(gtk_radio_button_group(GTK_RADIO_BUTTON(radio1)), "Decrypt a cipher text");
 	g_signal_connect (GTK_TOGGLE_BUTTON(radio2), "toggled", G_CALLBACK (decryption_selected), NULL);
 	gtk_table_attach_defaults(GTK_TABLE(table), radio2, 0, 1, 1, 2);
 	
@@ -555,7 +555,7 @@ int main (int argc, char *argv[]) {
     g_signal_connect(GTK_WINDOW(window3), "delete-event", G_CALLBACK (delete_event), NULL);
     g_signal_connect(GTK_WINDOW(window3), "destroy", G_CALLBACK (destroy_event), NULL);
     
-    gtk_container_set_border (GTK_CONTAINER(window3), 10);
+    gtk_container_set_border_width (GTK_CONTAINER(window3), 10);
     
     table = gtk_table_new(8, 7, TRUE);
     gtk_container_add(GTK_CONTAINER(window3), table);
@@ -642,7 +642,7 @@ int main (int argc, char *argv[]) {
     g_signal_connect(GTK_WINDOW(window4), "delete-event", G_CALLBACK (delete_event), NULL);
     g_signal_connect(GTK_WINDOW(window4), "destroy", G_CALLBACK (destroy_event), NULL);
     
-    gtk_container_set_border (GTK_CONTAINER(window4), 10);
+    gtk_container_set_border_width (GTK_CONTAINER(window4), 10);
     
     table = gtk_table_new(4, 7, TRUE);
     gtk_container_add(GTK_CONTAINER(window3), table);
@@ -667,7 +667,7 @@ int main (int argc, char *argv[]) {
 	
 	GtkWidget * label10 = gtk_label_new("Crypted Text");
     gtk_table_attach_defaults(GTK_TABLE(table), label10, 0, 1, 1, 2);
-    gtk_widget_show(labell0);
+    gtk_widget_show(label10);
     
     cry_entry = gtk_entry_new();
 	gtk_entry_set_visibility(GTK_ENTRY(cry_entry), TRUE);
