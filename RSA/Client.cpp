@@ -319,31 +319,6 @@ static void add_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
 	}
 }
 
-static void checkRepeatProcess(GtkWidget * window) {
-       GtkWidget * dialog = gtk_dialog_new_with_buttons("Do you want to start again",
-                                                        GTK_WINDOW(window),
-                                                        GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-                                                        GTK_STOCK_OK, 
-                                                        GTK_RESPONSE_ACCEPT,
-                                                        GTK_STOCK_CANCEL,
-                                                        GTK_RESPONSE_REJECT,
-                                                        NULL);
-                                                                
-       gint result = gtk_dialog_run (GTK_DIALOG (dialog));
-       switch (result) {
-              case GTK_RESPONSE_ACCEPT:
-                                       gtk_widget_show(window2);
-                                       gtk_widget_hide(GTK_WIDGET(window));
-                                       break;
-                                       
-              case GTK_RESPONSE_REJECT:
-                                       break;
-              default:
-                      break;
-      }
-    gtk_widget_destroy (dialog);
-}
-
 static void encrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) {     
     g_print ("Hello again - %s was pressed\n", (gchar *) data);
     gtk_entry_set_text(GTK_ENTRY(c_entry), "");
@@ -440,8 +415,6 @@ static void decrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) 
     } 
 }
 
-
-
 static void encryption_selected (GtkWidget * widget, GdkEvent * event, gpointer data) {
 	g_print ("Hello again - %s was pressed\n", (gchar *) data);
 	
@@ -471,7 +444,7 @@ int main (int argc, char ** argv) {
     GtkWidget * button;
     GtkWidget * entry;
         
-    gtk_init(argc, *argv);
+    gtk_init(*argc, argv);
     
     window1 = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window1), "LOGIN TO CLIENT");
@@ -689,6 +662,10 @@ int main (int argc, char ** argv) {
 	gtk_entry_set_text(GTK_ENTRY(pln_entry), "");
 	gtk_table_attach_defaults(GTK_TABLE(table), pln_entry, 1, 7, 3, 4);
 	gtk_widget_show (pln_entry);
+	
+	//*******WINDOW 5*********
+	//Selection
+	TODO:
         
 	gtk_main ();
    
