@@ -386,6 +386,21 @@ static void encrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) 
     }                    
 }
 
+static void yes_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
+    g_print ("Hello again - %s was pressed\n", (gchar *) data);
+    
+    gtk_widget_show(window2);
+    gtk_widget_hide(window4);
+    gtk_widget_hide(window3);
+    gtk_widget_hide(window5);
+}  
+
+static void no_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
+    g_print ("Hello again - %s was pressed\n", (gchar *) data);
+    
+    gtk_widget_hide(window5);
+} 
+
 static void decrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
     g_print ("Hello again - %s was pressed\n", (gchar *) data);
     gtk_entry_set_text(GTK_ENTRY(pln_entry), "");
@@ -618,7 +633,7 @@ int main (int argc, char ** argv) {
     gtk_container_set_border_width (GTK_CONTAINER(window4), 10);
     
     table = gtk_table_new(4, 7, TRUE);
-    gtk_container_add(GTK_CONTAINER(window3), table);
+    gtk_container_add(GTK_CONTAINER(window4), table);
     
     GtkWidget * label8 = gtk_label_new("d");
     gtk_table_attach_defaults(GTK_TABLE(table), label8, 0, 1, 0, 1);
@@ -665,7 +680,32 @@ int main (int argc, char ** argv) {
 	
 	//*******WINDOW 5*********
 	//Selection
-	TODO:
+	window5 = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(window5), "START AGAIN?");
+    
+    g_signal_connect(GTK_WINDOW(window5), "delete-event", G_CALLBACK (delete_event), NULL);
+    g_signal_connect(GTK_WINDOW(window5), "destroy", G_CALLBACK (destroy_event), NULL);
+    
+    gtk_container_set_border_width (GTK_CONTAINER(window5), 10);
+    
+    table = gtk_table_new(3, 5, TRUE);
+    gtk_container_add(GTK_CONTAINER(window5), table);
+    
+    label = gtk_label_new("Do you want to start again?");
+    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 0, 1);
+    gtk_widget_show(label);
+    
+    button = gtk_button_new_with_label ("Yes");
+	g_signal_connect (button, "clicked", G_CALLBACK (yes_event), (gpointer) "Yes Button");
+	gtk_table_attach_defaults(GTK_TABLE(table), button, 0, 2, 1, 3);
+	gtk_widget_show (button);
+	
+	button = gtk_button_new_with_label ("No");
+	g_signal_connect (button, "clicked", G_CALLBACK (no_event), (gpointer) "No Button");
+	gtk_table_attach_defaults(GTK_TABLE(table), button, 3, 5, 1, 3);
+	gtk_widget_show (button);
+	
+	//Work on when window 5 needs to be shown
         
 	gtk_main ();
    
