@@ -34,6 +34,7 @@ GtkWidget * window1;
 GtkWidget * window2;
 GtkWidget * window3;
 GtkWidget * window4;
+GtkWidget * window5;
 
 GtkWidget * p_entry;
 GtkWidget * q_entry;
@@ -368,21 +369,6 @@ static void encrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) 
     }                    
 }
 
-static void yes_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
-    g_print ("Hello again - %s was pressed\n", (gchar *) data);
-    
-    gtk_widget_show(window2);
-    gtk_widget_hide(window4);
-    gtk_widget_hide(window3);
-    gtk_widget_hide(window5);
-}  
-
-static void no_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
-    g_print ("Hello again - %s was pressed\n", (gchar *) data);
-    
-    gtk_widget_hide(window5);
-} 
-
 static void decrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
     g_print ("Hello again - %s was pressed\n", (gchar *) data);
     gtk_entry_set_text(GTK_ENTRY(pln_entry), "");
@@ -686,9 +672,9 @@ int main (int argc, char ** argv) {
     table = gtk_table_new(3, 5, TRUE);
     gtk_container_add(GTK_CONTAINER(window5), table);
     
-    label = gtk_label_new("Do you want to start again?");
-    gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 0, 1);
-    gtk_widget_show(label);
+    label1 = gtk_label_new("Do you want to start again?");
+    gtk_table_attach_defaults(GTK_TABLE(table), label1, 0, 1, 0, 1);
+    gtk_widget_show(label1);
     
     button = gtk_button_new_with_label ("Yes");
 	g_signal_connect (button, "clicked", G_CALLBACK (yes_event), (gpointer) "Yes Button");
