@@ -259,7 +259,7 @@ static void insert_text_enter (GtkTextBuffer * mbuffer, const char * initialText
 	}
 }*/
 
-/*static gboolean time_handler(GtkWidget * widget) {
+static gboolean time_handler(GtkWidget * widget) {
 	printf("Time\n");
 	if (widget->window == NULL) {
 		return FALSE;
@@ -267,33 +267,15 @@ static void insert_text_enter (GtkTextBuffer * mbuffer, const char * initialText
 
 	printf("Timew\n");
 	time_t curtime;
-        struct tm *loctime;
+    struct tm *loctime;
 	
 	curtime = time(NULL);
 	loctime = localtime(&curtime);
 	strftime(buffer, 256, "%T", loctime);
-	get_new_Rooms();
+	gtk_widget_show(window5);
 	
 	return TRUE;
 }
-
-static gboolean time_handler_users(GtkWidget * widget) {
-	printf("Time\n");
-	if (widget->window == NULL) {
-		return FALSE;
-	}
-
-	printf("Time2\n");
-	time_t curtime;
-        struct tm *loctime;
-	
-	curtime = time(NULL);
-	loctime = localtime(&curtime);
-	strftime(buffer, 256, "%T", loctime);
-	get_users_in_current_room();
-	get_messages_in_current_room();
-	return TRUE;
-}*/
 
 static void login_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
 	g_print ("Hello again - %s was pressed\n", (gchar *) data);	
@@ -382,7 +364,7 @@ static void encrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) 
         gtk_entry_set_text(GTK_ENTRY(public_entry), n_str);
         
         gtk_entry_set_text(GTK_ENTRY(c_entry), b);
-        checkRepeatProcess(window3);
+        time_handler(window3);
     }                    
 }
 
@@ -426,7 +408,7 @@ static void decrypt_event (GtkWidget * widget, GdkEvent * event, gpointer data) 
     }
     else {
         gtk_entry_set_text(GTK_ENTRY(pln_entry), response);
-        checkRepeatProcess(window4);
+        time_handler(window4);
     } 
 }
 
@@ -443,6 +425,19 @@ static void decryption_selected (GtkWidget * widget, GdkEvent * event, gpointer 
 	gtk_widget_hide(window2);
 	gtk_widget_show(window4);
 }
+
+static void yes_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
+    g_print ("Hello again - %s was pressed\n", (gchar *) data);
+    
+    gtk_widget_hide (window5);
+    gtk_widget_show (window2);
+}    
+
+static void no_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
+    g_print ("Hello again - %s was pressed\n", (gchar *) data);
+    
+    gtk_widget_hide (window5);
+} 
 
 static void logout_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
 	g_print ("Hello again - %s was pressed\n", (gchar *) data);
@@ -704,9 +699,7 @@ int main (int argc, char ** argv) {
 	g_signal_connect (button, "clicked", G_CALLBACK (no_event), (gpointer) "No Button");
 	gtk_table_attach_defaults(GTK_TABLE(table), button, 3, 5, 1, 3);
 	gtk_widget_show (button);
-	
-	//Work on when window 5 needs to be shown
-        
+	    
 	gtk_main ();
    
   	return 0;
