@@ -148,31 +148,6 @@ static void enter_callback_pass (GtkWidget * widget, GtkWidget * entry) {
 	printf("Password contents: %s\n", pass_text);
 }
 
-/*static void send_event (GtkWidget * widget, GdkEvent * event, gpointer data) {
-	g_print ("Hello again - %s was pressed\n", (gchar *) data);
-	char * user = strdup(user_text);
-	char * pass = strdup(pass_text);
-	char * response = (char *) malloc(1000 * sizeof(char));
-	
-	GtkTextIter start;
-	GtkTextIter end;
-
-	GtkTextBuffer * buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(sview));
-	gtk_text_buffer_get_start_iter(buffer, &start);
-	gtk_text_buffer_get_end_iter(buffer, &end);
-	gchar * message = gtk_text_buffer_get_text(GTK_TEXT_BUFFER(buffer), &start, &end, FALSE); 
-
-	char * withRoom = (char *) malloc(10000*sizeof(char));
-	withRoom = strcpy(withRoom, room);
-	withRoom = strcat(withRoom, " ");
-	withRoom = strcat(withRoom, message);
-
-	int n = sendCommand ("localhost", 1991, "SEND-MESSAGE", user, pass, withRoom, response);  
-	if(strcmp("OK", response) < 0) {
-		gtk_text_buffer_set_text(GTK_TEXT_BUFFER(buffer), "", -1);		
-	}
-}*/
-
 /* Add some text to our text widget - this is a callback that is invoked
 when our window is realized. We could also force our window to be
 realized with gtk_widget_realize, but it would have to be part of
@@ -196,69 +171,6 @@ static void insert_text_enter (GtkTextBuffer * mbuffer, const char * initialText
    	gtk_text_buffer_get_end_iter (mbuffer, &iter);
 	gtk_text_buffer_insert (mbuffer, &iter, initialText,  -1);
 }
-
-/*static void process_message (char * input) {
-	if (strcmp(input, "NO-NEW-MESSAGES\r\n") == 0) {
-		GtkTextBuffer * mbuffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW(mview));
-		insert_text (mbuffer, "");
-	}
-	else {
-		char * final_message = (char *) malloc(10000 * sizeof(char));
-		
-		char * p = input;
-		char * q = final_message;
-		char * prev = (char *) malloc(1 * sizeof(char));
-		*prev = '\0';
-		while (*p != '\0') {
-			if (*prev == '\0') {
-				while (*p != ' ') {
-					p++;
-				}
-				p++;
-				while (*p != '\0' && *p != ' ') {
-					*q = *p;
-					q++;
-					p++;
-				}
-				*q = ':';
-				q++;
-				*q = ' ';
-				q++;
-				p++;
-			}
-			if (*prev != '\0' && (*prev == '\r' && *p == '\n')) {
-				messageCount++;
-				*q = '\n';
-				*prev = *p;
-				p++;
-				q++;
-				while (*p != '\0' && *p != ' ') {
-					p++;
-				}
-				p++;
-
-				while (*p != '\0' && *p != ' ') {
-					*q = *p;
-					q++;
-					p++;
-				}
-				*q = ':';
-				q++;
-				*q = ' ';
-				q++;
-				p++;
-			}
-			*q = *p;
-			q++;
-			*prev = *p;
-			p++;
-		}
-		*q = '\0';
-
- 		GtkTextBuffer * mbuffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mview));
-		insert_text (mbuffer, final_message);
-	}
-}*/
 
 static gboolean time_handler(GtkWidget * widget) {
 	printf("Time\n");
@@ -440,7 +352,7 @@ int main (int argc, char ** argv) {
     GtkWidget * button;
     GtkWidget * entry;
         
-    gtk_init(*argc, argv);
+    gtk_init(&argc, &argv);
     
     window1 = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window1), "LOGIN TO CLIENT");
