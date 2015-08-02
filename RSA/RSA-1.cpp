@@ -197,7 +197,7 @@ void RSAServer::processRequest (int fd) {
 	// Add null character at the end of the string
 	// Eliminate last \r
 	commandLineLength--;
-    commandLine[commandLineLength] = 0;
+        commandLine[commandLineLength] = 0;
 
 	//char * copy = strdup(commandLine);
 
@@ -431,7 +431,7 @@ void RSAServer::encryptMessage(int fd, const char * user, const char * password,
     		spaces[i] = -10;
     	}
     	
-    	char * commandLine = strcpy(commandLine, args);
+    	char * commandLine = strdup(args);
     
     	for (i = 0; commandLine[i] != '\0'; i++) {
     		if (commandLine[i] == ' ')
@@ -442,70 +442,73 @@ void RSAServer::encryptMessage(int fd, const char * user, const char * password,
     	int j = 0;
     	    
     	// First input is value of p
-        for (i = spaces[0] + 1, j = 0; i < spaces[1]; i++, a++) {
+        for (i = 0, j = 0; i < spaces[0]; i++, a++) {
     		str_p[j++] = *a;
     	}
     	str_p[j] = '\0';
     	a++;
     
         // Next os value of q    
-    	for (i = spaces[1] + 1, j = 0; (spaces[2] > 0) ? (i < spaces[2]):(commandLine[i] != '\0'); i++, a++) {
+    	for (i = spaces[0] + 1, j = 0; (spaces[1] > 0) ? (i < spaces[1]):(commandLine[i] != '\0'); i++, a++) {
     		str_q[j++] = *a;
     	}
     	str_q[j] = '\0';
     	a++;
     
         // Third is value of e
-    	for (i = spaces[2] + 1, j = 0; (spaces[3] > 0) ? (i < spaces[3]):(commandLine[i] != '\0'); i++, a++) {
+    	for (i = spaces[1] + 1, j = 0; (spaces[2] > 0) ? (i < spaces[2]):(commandLine[i] != '\0'); i++, a++) {
     		str_e[j++] = *a;
     	}
     	str_e[j] = '\0';
     	a++;
     	
     	// Rest is message
-    	for (i = spaces[3] + 1, j = 0; i >= 0 && commandLine[i] != '\0'; i++, a++) {
+    	for (i = spaces[2] + 1, j = 0; i >= 0 && commandLine[i] != '\0'; i++, a++) {
     		str_m[j++] = *a;
     	}
     	str_m[j] = '\0';
     	
     	int p_len = strlen(str_p);
         int p = 0;
-        i = 0;
-        while (i <= p_len - 1) {
-              p += pow(10, i) * (str_p[i] - 48);
-              i++;
+        i = p_len - 1;
+	j = 0;
+        while (i >= 0) {
+              p += pow(10, j++) * (str_p[i] - 48);
+              i--;
         }
         
         int q_len = strlen(str_q);
         int q = 0;
-        i = 0;
-        while (i <= q_len - 1) {
-              q += pow(10, i) * (str_q[i] - 48);
-              i++;
+        i = q_len - 1;
+	j = 0;
+        while (i >= 0) {
+              q += pow(10, j++) * (str_q[i] - 48);
+              i--;
         }
         
         int e_len = strlen(str_e);
         int e = 0;
-        i = 0;
-        while (i <= e_len - 1) {
-              e += pow(10, i) * (str_e[i] - 48);
-              i++;
+        i = e_len - 1;
+	j = 0;
+        while (i >= 0) {
+              e += pow(10, j++) * (str_e[i] - 48);
+              i--;
         }
         
         int phi = (p - 1) * (q - 1);
         
         if (p < 11 || p > 1000 || isPrime(p) != 0) {
-              write(fd, "ERROR: Incorrect Input for p", 22);
+              write(fd, "Incorrect Input for p", 22);
               return;
         }
         
         else if (q < 11 || q == p || q > 1000 || isPrime(q) != 0) {
-              write(fd, "ERROR: Incorrect Input for q", 22);
+              write(fd, "Incorrect Input for q", 22);
               return;
         }
                 
         else if (gcdCalculator(e, phi) != 1 || e <= 1 || e >= phi) {
-              write(fd, "ERROR: Incorrect Input for e", 22);
+              write(fd, "Incorrect Input for e", 22);
               return;
         }  
         
@@ -516,15 +519,9 @@ void RSAServer::encryptMessage(int fd, const char * user, const char * password,
         // Encrypt message. Input for p and q is perfect
         else {
               int n = p * q;   
-              char * enc_string = (char *) malloc(10000 * sizeof(char));
+              char * enc_string = (char *) malloc(strlen(str_m) * 2 * sizeof(char));
               int ctr_string = 0;
               int d = modInverse(e, phi);
-              char d_string[100];
-              sprintf(d_string, "%d", d);             
-              
-              ctr_string += strlen(d_string) + 1;
-              enc_string = strcpy(enc_string, d_string);
-              enc_string = strcpy(enc_string, " ");
               
               for (int k = 0; k < strlen(str_m); k++) {               
                   int ascii = (int) str_m[k];
@@ -540,8 +537,6 @@ void RSAServer::encryptMessage(int fd, const char * user, const char * password,
                      ctr_string += 2;
                   }
               }
-              
-              enc_string[ctr_string + 1] = '\0';
               // Write the encrypted message into string
               write (fd, enc_string, strlen(enc_string));  
         }
@@ -559,7 +554,7 @@ int RSAServer::generateCipherValue(int m, int e, int n) {
 }
 
 int RSAServer::isPrime(int num) {
-    int i = 11;
+    int i = 2;
     int rem = 0;
     while (i <= num/2) {
           rem = 0;
@@ -569,8 +564,9 @@ int RSAServer::isPrime(int num) {
           if (rem == 0) {
               return -1;
           }
+	  i++;
     }
-    return 0;
+    return0;
 }
 
 int RSAServer::gcdCalculator (int x, int y) {
@@ -668,12 +664,12 @@ void RSAServer::decryptMessage (int fd, const char * user, const char * password
         }
         
         if (d <= 0 || n <= 1) {
-              write(fd, "ERROR: Incorrect Input for d/n", 24);
+              write(fd, "Incorrect Input for d/n", 24);
               return;
         }
         
         else if (strcmp(str_m, "") == 0) {
-             write(fd, "ERROR: Incorrect input for message", 27);
+             write(fd, "Incorrect input for message", 27);
              return;
         }
         
