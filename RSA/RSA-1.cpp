@@ -523,7 +523,15 @@ void RSAServer::encryptMessage(int fd, const char * user, const char * password,
               int ctr_string = 0;
               int d = modInverse(e, phi);
               
-              for (int k = 0; k < strlen(str_m); k++) {               
+              char * d_string = (char *) malloc (100 * sizeof(char));
+	      sprintf(d_string, "%d", d);             
+	
+	      
+	      ctr_string += strlen(d_string) + 1;
+	      enc_string = strcpy(enc_string, d_string);
+	      enc_string = strcat (enc_string, " ");
+	      
+	      for (int k = 0; k < strlen(str_m); k++) {               
                   int ascii = (int) str_m[k];
                   int cipher_value = generateCipherValue(ascii, e, n);
                   if (cipher_value < 10) {
@@ -537,20 +545,21 @@ void RSAServer::encryptMessage(int fd, const char * user, const char * password,
                      ctr_string += 2;
                   }
               }
-              // Write the encrypted message into string
+             
+	      enc_string[ctr_string + 1] = '\0';
+	      // Write the encrypted message into string
               write (fd, enc_string, strlen(enc_string));  
         }
      }    
 }
 
 int RSAServer::generateCipherValue(int m, int e, int n) {
-    int c = 1;
-    int temp = 1;
-    for (int i = 1; i <= e; i++) {
-         temp = m * c;
-         c = temp - ((temp/n) * n);
-    }   
-    return c;
+    int rem = 0;
+    double temp = 0;
+
+    temp = pow (m, e);
+    rem = fmod(temp, n);
+    return rem;
 }
 
 int RSAServer::isPrime(int num) {
@@ -566,7 +575,7 @@ int RSAServer::isPrime(int num) {
           }
 	  i++;
     }
-    return0;
+    return 0;
 }
 
 int RSAServer::gcdCalculator (int x, int y) {
@@ -589,9 +598,10 @@ int RSAServer::gcdCalculator (int x, int y) {
 }
 
 int RSAServer::modInverse (int e, int phi) {
-    int d = 1;
+    int d = 0;
     int rem = 0; 
     do {
+    	d++;
         int quotient = (d * e)/phi;
         int c = quotient * phi;
         rem = (d * e) - c;
