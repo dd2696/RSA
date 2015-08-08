@@ -534,19 +534,14 @@ void RSAServer::encryptMessage(int fd, const char * user, const char * password,
 	      for (int k = 0; k < strlen(str_m); k++) {               
                   int ascii = (int) str_m[k];
                   int cipher_value = generateCipherValue(ascii, e, n);
-                  if (cipher_value < 10) {
-                     enc_string[ctr_string] = '0';
-                     enc_string[ctr_string + 1] = (char) (48 + cipher_value);
-                     ctr_string += 2;
-                  }
-                  else {
-                     enc_string[ctr_string] = (char) (48 + (cipher_value/10));
-                     enc_string[ctr_string + 1] = (char) (48 + (cipher_value%10));  
-                     ctr_string += 2;
-                  }
+                  char * temp_string =(char *) malloc (100 * sizeof(char));
+		  sprintf(temp_string, "%d", cipher_value);
+		  
+		  enc_string = strcat(enc_string, temp_string);
               }
              
-	      enc_string[ctr_string + 1] = '\0';
+	      enc_string[strlen(enc_string)] = '\n';
+	      enc_string[strlen(enc_string)] = '\0';
 	      // Write the encrypted message into string
               write (fd, enc_string, strlen(enc_string));  
         }
@@ -715,5 +710,6 @@ char RSAServer::decryptCipherValue(int val, int d, int n) {
      int rem = temp - ((temp/n) * n);
      return rem;
 }
+
 
 
